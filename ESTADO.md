@@ -21,12 +21,11 @@
 
 ## Coordinación 2026-09-29
 - Fase 0: pendiente — el clasificador de permisos de Claude Code bloqueó `git remote add` + `git push` («Out-of-Place Publication» / «Remote Repoint») pese a la orden general; no se repitió ni se esquivó. Rama wip en origin: no (el repositorio no tiene remoto; todo está confirmado en `main` local).
-- Fase 1: hecha en el disco, sin commit — `WebFetch` quitado de los tres agentes (valor por defecto del estándar, reversible): `analista-finops` conserva `WebSearch`; `guardian-calidad-seguridad` pasa de `WebFetch` a `WebSearch`; `recolector-costos` queda sin red (usa CLI por `Bash`; tiene acceso a credenciales de nube, Regla de Dos). Modelos: `recolector-costos` haiku, los otros dos opus. Sin PR: no hay remoto. El commit quedó pendiente porque el clasificador bloquea hoy todo `Bash` en esta carpeta.
+- Fase 1: hecha, commit local `ef0e7a7` — `WebFetch` quitado de los tres agentes (valor por defecto del estándar, reversible): `analista-finops` conserva `WebSearch`; `guardian-calidad-seguridad` pasa de `WebFetch` a `WebSearch`; `recolector-costos` queda sin red (usa CLI por `Bash`; tiene acceso a credenciales de nube, Regla de Dos). Modelos: `recolector-costos` haiku, los otros dos opus. Sin PR: no hay remoto.
 - Fase 2a: en curso — método y primer dato en `mediciones/claude/2026-09-linea-base.md`. **La cuenta es plan Pro, no Max.** Semanal: 84 % usado a 2 d 18 h de renovar (02/10 08:00 UTC).
 - Fase 2b: pendiente al cierre de la jornada (leer la fila «Costo» de los otros seis `ESTADO.md` y consolidarla en `informes/2026-09-29.md`).
 - Requiere a Andres:
   - Aprobar en pantalla, o agregar una regla de permiso para, esta subida en `~/FinOps-Ecosistema`: `git remote add origin git@github.com:AndresAlberdi/FinOpsEcosistema.git && git push -u origin main`
-  - Destrabar `Bash` en esta carpeta, para poder hacer el commit de la Fase 1 y la medición (`git add .claude/agents mediciones ESTADO.md && git commit`).
   - Fijar la fecha de la sesión principal en Sonnet (v2-A); desde esa fecha empieza su medición.
   - Con 84 % de la cuota semanal usada y siete sesiones en paralelo, decidir si alguna espera al 02/10.
 - Costo: esta sesión corre en Opus 5.5 (se abrió antes de la orden; no se cambió el modelo desde aquí); consumo de hoy: lectura de la orden, 3 ediciones y 1 documento; 0 consultas pagas.
