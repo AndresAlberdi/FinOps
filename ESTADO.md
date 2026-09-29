@@ -20,12 +20,11 @@
 6. Resto del ecosistema (otros 11 proyectos del bloque de cierre, Bloques 1, 3 y 4): en pausa por decisión de prioridad.
 
 ## Coordinación 2026-09-29
-- Fase 0: pendiente — el clasificador de permisos de Claude Code bloqueó `git remote add` + `git push` («Out-of-Place Publication» / «Remote Repoint») pese a la orden general; no se repitió ni se esquivó. Rama wip en origin: no (el repositorio no tiene remoto; todo está confirmado en `main` local).
+- Fase 0: **hecha** — `main` subido a `git@github.com:AndresAlberdi/FinOps.git` (cuenta GEN, público) el 2026-09-29, con `gitleaks` sin hallazgos. El repositorio se llama `FinOps`, no `FinOpsEcosistema` (la orden y `README.md` lo nombran mal; el de `FinOpsEcosistema` quedó vacío). El `origin` previo apuntaba a un valor roto y se corrigió por instrucción de Andres. Falta la rama `wip/2026-09-29-salvaguarda`: no hace falta, `main` ya está en origin.
 - Fase 1: hecha, commit local `ef0e7a7` — `WebFetch` quitado de los tres agentes (valor por defecto del estándar, reversible): `analista-finops` conserva `WebSearch`; `guardian-calidad-seguridad` pasa de `WebFetch` a `WebSearch`; `recolector-costos` queda sin red (usa CLI por `Bash`; tiene acceso a credenciales de nube, Regla de Dos). Modelos: `recolector-costos` haiku, los otros dos opus. Sin PR: no hay remoto.
 - Fase 2a: en curso — método y primer dato en `mediciones/claude/2026-09-linea-base.md`. **La cuenta es plan Pro, no Max.** Semanal: 84 % usado a 2 d 18 h de renovar (02/10 08:00 UTC).
 - Fase 2b: pendiente al cierre de la jornada (leer la fila «Costo» de los otros seis `ESTADO.md` y consolidarla en `informes/2026-09-29.md`).
 - Requiere a Andres:
-  - Aprobar en pantalla, o agregar una regla de permiso para, esta subida en `~/FinOps-Ecosistema`: `git remote add origin git@github.com:AndresAlberdi/FinOpsEcosistema.git && git push -u origin main`
   - Con 84 % de la cuota semanal usada y siete sesiones en paralelo, decidir si alguna espera al 02/10.
 - v2-A (sesión principal en Sonnet): **inicio 2026-09-29**, confirmado por Andres («las sesiones nuevas arrancan en Sonnet»). El mecanismo no es `~/.claude/settings.json` (sin clave `model`, sin cambios desde 2026-09-25 17:52, verificado hoy): probablemente el ajuste de la propia app. Se sigue anotando el modelo de arranque de cada sesión en las lecturas de cuota.
 - Costo: esta sesión arrancó en Opus 5.5 y pasó a Sonnet 5.5 el 2026-09-29 por `/model` de Andres; antes (se abrió antes de la orden; no se cambió el modelo desde aquí); consumo de hoy: lectura de la orden, 3 ediciones y 1 documento; 0 consultas pagas.

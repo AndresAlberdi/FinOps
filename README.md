@@ -9,6 +9,6 @@ Optimización de costos y recursos de todo el ecosistema (Claude/Anthropic, AWS,
 
 Este repositorio no contiene datos de facturación ni identificadores completos: esos datos viven en `datos/`, que git ignora.
 
-Repositorio: `git@github.com:AndresAlberdi/FinOpsEcosistema.git` (público, modo A del estándar DevSecOps v2).
+Repositorio: `git@github.com:AndresAlberdi/FinOps.git` (público, modo A del estándar DevSecOps v2).
 
 Licencia: Apache 2.0 (`LICENSE`).
