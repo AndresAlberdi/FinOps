@@ -17,6 +17,9 @@ La cuenta usa el **plan Pro** (no Max, como suponían `docs/00` §2 y `docs/01` 
 5. **Comparación:** semana del 25/09 al 02/10 (mezcla: la v1 rige desde el 28/09) frente a la semana del 02/10 al 09/10 (v1 completa) y la siguiente a la fecha en que Andres fije la sesión principal en Sonnet (v2-A).
 6. **No regresión (quién la vigila):** PR con defectos hallados por `revisor-codigo` después de la fusión y retrabajo; lo reporta cada sesión en su `ESTADO.md` §«Coordinación», fila «Costo».
 
+7. **Palanca A (sesión principal en Sonnet): se mide por observación, no por configuración.** Según SeguridadGeneral (2026-09-29), `/model <nombre>` guarda el valor por defecto en la CLI, pero en la app de escritorio no se observó ese guardado (`~/.claude/settings.json` sin clave `model` tras un `/model sonnet`). La fecha de inicio de A es el primer día en que Andres confirma que una sesión **nueva** arranca en Sonnet; desde entonces, en cada lectura se anota el modelo con que arrancó cada sesión principal abierta ese día.
+8. **Tarifas de referencia** (claude.com/pricing, consultadas por SeguridadGeneral el 2026-09-29; matriz §9 de SeguridadGeneral): Haiku 4.5, USD 1/5 por millón de tokens de entrada y salida, lectura de caché USD 0,10; la página ya nombra «Sonnet 5.5» (verificar si cambia la tarifa de Sonnet antes de usarla).
+
 ## 3. Serie
 
 | Fecha y hora (UTC) | Ventana 5 h | Semanal, todos los modelos | Semanal, Fable | Uso extra | Nota |

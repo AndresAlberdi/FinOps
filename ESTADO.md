@@ -26,7 +26,7 @@
 - Fase 2b: pendiente al cierre de la jornada (leer la fila «Costo» de los otros seis `ESTADO.md` y consolidarla en `informes/2026-09-29.md`).
 - Requiere a Andres:
   - Aprobar en pantalla, o agregar una regla de permiso para, esta subida en `~/FinOps-Ecosistema`: `git remote add origin git@github.com:AndresAlberdi/FinOpsEcosistema.git && git push -u origin main`
-  - Fijar la fecha de la sesión principal en Sonnet (v2-A); desde esa fecha empieza su medición.
+  - Abrir una sesión nueva y confirmar con qué modelo arranca: en la app de escritorio `/model sonnet` no quedó guardado en `~/.claude/settings.json` (dato de SeguridadGeneral). La medición de v2-A empieza el día en que una sesión nueva arranque en Sonnet.
   - Con 84 % de la cuota semanal usada y siete sesiones en paralelo, decidir si alguna espera al 02/10.
 - Costo: esta sesión corre en Opus 5.5 (se abrió antes de la orden; no se cambió el modelo desde aquí); consumo de hoy: lectura de la orden, 3 ediciones y 1 documento; 0 consultas pagas.
 
