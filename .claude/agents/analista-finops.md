@@ -1,7 +1,7 @@
 ---
 name: analista-finops
 description: "Analista FinOps. Usar para convertir la línea base de un proveedor en propuestas de ahorro priorizadas, cada una con ahorro esperado, supuesto, riesgo, prueba de no regresión, reversión y proyecto dueño. Solo lectura sobre recursos; escribe propuestas en propuestas/."
-tools: Read, Grep, Glob, Bash, Write, WebFetch, WebSearch
+tools: Read, Grep, Glob, Bash, Write, WebSearch
 model: opus
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: guardian-calidad-seguridad
 description: "Guardián de calidad y seguridad de las propuestas de ahorro. Usar proactivamente antes de presentar cualquier propuesta a Andres o entregarla a un proyecto dueño. Emite veredicto contra docs/03-guardarrailes.md. Solo lectura."
-tools: Read, Grep, Glob, Bash, WebFetch
+tools: Read, Grep, Glob, Bash, WebSearch
 model: opus
 ---
 
