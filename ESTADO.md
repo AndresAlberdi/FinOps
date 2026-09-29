@@ -1,6 +1,6 @@
 # ESTADO — FinOps-Ecosistema
 
-**Última actualización:** 2026-09-28
+**Última actualización:** 2026-09-29
 
 ## Punto de retorno (leer primero al abrir una sesión)
 
@@ -12,6 +12,7 @@
    - b. **segurolotengo-demo**: `docs/claude/` va en el mismo commit que `CLAUDE.md` (si se pierde, se pierde el contenido que salió de `CLAUDE.md`); no mover `PLAN_AGENTES_SEGUROLOTENGO.md`.
    - c. **NovuChat**: 15 agentes modificados + `planificador` y `revisor-codigo`; dejar fuera `Analisis/` y `Demo-Recursos/`.
    - **Riesgo mientras tanto:** los cambios están solo en disco; no usar `git checkout .`, `git clean` ni cambiar de rama en esas carpetas.
+1b. **v2 (Haiku + sesión base Sonnet)** — `propuestas/transversal/2026-09-modelo-por-rol-v2.md`, enviada el 2026-09-29 a la sesión «Estatus del proyecto» de SeguridadGeneral. Pendiente: su simulación, la decisión sobre `revisor-codigo`/`code-reviewer` a sonnet (choca con `docs/03` §1.9) y pasar `recolector-costos` de FinOps a `haiku` (lo hace esta sesión, cuando SeguridadGeneral publique el criterio).
 2. **Decisión de Andres:** qué es `slt-rediseno` (¿proyecto activo o copia de `segurolotengo-demo`?). Si es activo: `seguridad-cumplimiento` está en sonnet, faltan `planificador`/`revisor-codigo`, `CLAUDE.md` de 69 KB.
 3. **Decisión de Andres:** qué agente `seguridad` usa esta sesión (no existe en `.claude/agents/` de FinOps; candidato: el de SeguridadGeneral).
 4. **Bloque 0 de FinOps (postergado):** falta, con «sí» de Andres, `git remote add origin git@github.com:AndresAlberdi/FinOpsEcosistema.git` y *push* de `main` (el clasificador de permisos lo bloqueó; aprobarlo en pantalla). Después: rama `chore/estandar-devsecops`, `/aplicar-estandar-devsecops` modo A, ruleset, PR.
