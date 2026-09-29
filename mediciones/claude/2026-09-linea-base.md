@@ -31,3 +31,21 @@ La cuenta usa el **plan Pro** (no Max, como suponían `docs/00` §2 y `docs/01` 
 - **Antes del 28/09 no hay serie:** la herramienta no da historia. Si Andres quiere un punto previo, se puede leer su captura de claude.ai → Settings → Usage (verificar si muestra semanas anteriores). No se usan los transcripts de `~/.claude/projects`, que las reglas de Andres dejan fuera.
 - El 84 % con más de dos días por delante indica que **esta semana la cuota es la restricción real**; la jornada paralela de hoy la consume más rápido. La cifra de la semana 25/09–02/10 no es representativa del uso normal.
 - La comparación es de cuota, no de USD: el ahorro en USD solo existe si se evita activar el uso extra o subir de plan.
+
+## 5. Verificación del modelo de arranque (2026-09-29, ~15:25 UTC)
+
+Fuente: `get_session` (metadatos; no lee conversaciones). **El campo `model` es el modelo actual de la sesión, no el de arranque.** No hay historial de cambios.
+
+| Sesión | Creada (UTC) | Modelo ahora | Lectura |
+|---|---|---|---|
+| FinOps (esta) | 09-29 02:42 | sonnet-5-5 | Arrancó en **Opus**; pasó a Sonnet por `/model` de Andres |
+| NovuChat · Análisis financiero | 09-29 02:34 | sonnet-5-5 | Única creada hoy que está en Sonnet; no se sabe si arrancó así |
+| SeguroLoTengo · Confirmar modelo por rol | 09-29 12:28 | **opus-5-5** | Creada por otra sesión (`parentSessionId`), no abierta por Andres |
+| NovuChat · Constructora/Operadora | 09-25 20:33 | **opus-5-5** | Inactiva desde 05:39 UTC; no se reinició |
+| SeguridadGeneral, Claude-Proyectos, SeguroLoTengo, PRETSO, WhatsApp-Modular, NovuChat (principal y cartera) | 08-19 a 09-27 | sonnet-5-5 | Creadas antes de hoy: cambiadas después de crearse, no «arrancaron» en Sonnet |
+
+**Conclusión: no confirmada.** Ninguna sesión creada por Andres después de su prueba (~15:00 UTC) existe todavía, así que no hay caso limpio. Las sesiones antiguas en Sonnet fueron cambiadas; dos siguen en Opus. Los datos son compatibles con «se cambiaron a mano» tanto como con «arrancan en Sonnet».
+
+**Prueba limpia pendiente:** Andres abre una sesión nueva desde el botón de la app (sin escribir `/model`) y FinOps lee su `model` con `get_session` de inmediato. Si dice `claude-sonnet-5-5`, A queda confirmada con esa hora.
+
+**Cuota por modelo:** `get_usage` no separa por modelo salvo la ventana «Weekly · Fable» (73 %, no se sabe qué modelos incluye); no permite fijar desde qué hora cambió el consumo.
