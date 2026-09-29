@@ -1,0 +1,31 @@
+# ==============================================================================
+# Datos de facturación y exportes — NUNCA versionar (CLAUDE.md, invariante 6)
+# ==============================================================================
+datos/
+*.csv
+*.parquet
+*.xlsx
+!docs/**/*.xlsx
+
+# Credenciales — una sola excepción, .env.example
+.env
+.env.*
+!.env.example
+*TOKEN*.txt
+*token*.txt
+*.key
+*.pem
+service-account*.json
+*key*.json
+credentials*.json
+
+# Ruido local
+*.local
+.DS_Store
+node_modules/
+__pycache__/
+.venv/
+.ruff_cache/
+.pytest_cache/
+.security-reports/
+.trivy-cache/
