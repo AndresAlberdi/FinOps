@@ -26,9 +26,9 @@
 - Fase 2b: pendiente al cierre de la jornada (leer la fila «Costo» de los otros seis `ESTADO.md` y consolidarla en `informes/2026-09-29.md`).
 - Requiere a Andres:
   - Aprobar en pantalla, o agregar una regla de permiso para, esta subida en `~/FinOps-Ecosistema`: `git remote add origin git@github.com:AndresAlberdi/FinOpsEcosistema.git && git push -u origin main`
-  - Abrir una sesión nueva y confirmar con qué modelo arranca: en la app de escritorio `/model sonnet` no quedó guardado en `~/.claude/settings.json` (dato de SeguridadGeneral). La medición de v2-A empieza el día en que una sesión nueva arranque en Sonnet.
   - Con 84 % de la cuota semanal usada y siete sesiones en paralelo, decidir si alguna espera al 02/10.
-- Costo: esta sesión corre en Opus 5.5 (se abrió antes de la orden; no se cambió el modelo desde aquí); consumo de hoy: lectura de la orden, 3 ediciones y 1 documento; 0 consultas pagas.
+- v2-A (sesión principal en Sonnet): **inicio 2026-09-29**, confirmado por Andres («las sesiones nuevas arrancan en Sonnet»). El mecanismo no es `~/.claude/settings.json` (sin clave `model`, sin cambios desde 2026-09-25 17:52, verificado hoy): probablemente el ajuste de la propia app. Se sigue anotando el modelo de arranque de cada sesión en las lecturas de cuota.
+- Costo: esta sesión arrancó en Opus 5.5 y pasó a Sonnet 5.5 el 2026-09-29 por `/model` de Andres; antes (se abrió antes de la orden; no se cambió el modelo desde aquí); consumo de hoy: lectura de la orden, 3 ediciones y 1 documento; 0 consultas pagas.
 
 ## Hecho
 - 2026-09-28 · Proyecto creado: `CLAUDE.md`, `docs/00` a `docs/04`, `Prompts/arranque.md`, agentes `recolector-costos`, `analista-finops` y `guardian-calidad-seguridad`.
