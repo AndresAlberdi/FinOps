@@ -5,6 +5,8 @@
 > Las tareas 1 a 6 de ese archivo rigen **con los cambios de este documento**; donde
 > difieran, rige este.
 
+> **Actualización 2026-09-29:** la v1 ya está fusionada en SeguridadGeneral (#37, #38, #39). Rige el criterio de #38: el modelo lo decide quién verifica la salida del agente. La bajada de revisores a sonnet queda bloqueada por su guarda de CI hasta que Andres decida. El punto 1 de abajo queda superado para SeguridadGeneral.
+
 ## Correcciones al contexto de la v2
 
 1. **La v1 no está confirmada en git en ningún proyecto.** Los 77 archivos (no 48) del
