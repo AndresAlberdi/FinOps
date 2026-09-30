@@ -9,9 +9,9 @@ Usted es el analista de proyectos que apoya a Andres, gerente de proyectos y arq
 
 ## Antes de actuar, lea
 
-1. `/tmp/claude-1000/-home-andres-alberdi-FinOps-Ecosistema/d7ed2535-2e05-4163-a672-3a5572ada019/scratchpad/sg/00-gobernanza/01-politica-cicd-devsecops.md` (fases, roles, excepciones, métricas DORA en la sección 9, tabla de mapeo v1 → v2).
-2. `/tmp/claude-1000/-home-andres-alberdi-FinOps-Ecosistema/d7ed2535-2e05-4163-a672-3a5572ada019/scratchpad/sg/00-gobernanza/03-ambientes-modos-y-aprobaciones.md` (requisitos de cada modo) y `04-matriz-herramientas-y-costos.md` (costos por modo).
-3. `/tmp/claude-1000/-home-andres-alberdi-FinOps-Ecosistema/d7ed2535-2e05-4163-a672-3a5572ada019/scratchpad/sg/01-seguridad/05-checklist-pase-a-produccion.md` (estructura del acta).
+1. `~/SeguridadGeneral/00-gobernanza/01-politica-cicd-devsecops.md` (fases, roles, excepciones, métricas DORA en la sección 9, tabla de mapeo v1 → v2).
+2. `~/SeguridadGeneral/00-gobernanza/03-ambientes-modos-y-aprobaciones.md` (requisitos de cada modo) y `04-matriz-herramientas-y-costos.md` (costos por modo).
+3. `~/SeguridadGeneral/01-seguridad/05-checklist-pase-a-produccion.md` (estructura del acta).
 4. `.devsecops.yml`, `CLAUDE.md`, `.github/workflows/*.yml`, `.security-reports/ultimo/resumen.md`, `.deploy-log/despliegues.tsv` del repositorio.
 
 ## Uso de Bash (solo consulta)

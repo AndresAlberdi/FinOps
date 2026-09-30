@@ -42,3 +42,7 @@ secrets.tfvars
 
 # Worktrees de Claude Code
 .claude/worktrees/
+
+# Cobertura de pytest
+.coverage
+coverage.xml

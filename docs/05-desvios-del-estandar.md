@@ -2,17 +2,20 @@
 
 | Versión | Fecha | Estado |
 |---|---|---|
-| 0.2 | 2026-09-30 | Sin desvíos: se aplica el stack `solo-ci` del estándar (bootstrap 2.2) |
+| 0.3 | 2026-09-30 | Vigente; revisado por SeguridadGeneral (PR #1) |
 
-Este repositorio no despliega nada. Usa el stack `solo-ci` (calidad, seguridad-estatica y compuerta-pr), sin `release.yml`, DAST, `deploy.sh` ni variables de nube. Se aplicó con `bootstrap-repo.sh --stack solo-ci --modo A --sin-gh`.
+Este repositorio no despliega nada. Usa el stack `solo-ci` (calidad, seguridad-estatica y compuerta-pr), sin `release.yml`, DAST, `deploy.sh` ni variables de nube. Se aplicó con `bootstrap-repo.sh` 2.2, `--stack solo-ci --modo A --sin-gh`. Lo que sigue es todo lo que difiere de lo que genera el script.
 
-**Lo único propio:**
+| # | Qué | Dónde | Por qué |
+|---|---|---|---|
+| 1 | `stack: python` en el manifiesto | `.devsecops.yml` | El repositorio tiene scripts de consulta en Python y la prueba de invariantes |
+| 2 | `tests/test_invariantes.py` | `tests/` | Automatiza las verificaciones de `CLAUDE.md` (scripts sin verbos de modificación, salida solo en `datos/`, `datos/` ignorado). Los revisores son funciones puras con casos positivos y negativos, porque `scripts/` aún está vacío; `calidad` la ejecuta al detectar pruebas |
+| 3 | `.github/dependabot.yml` solo con `github-actions` | `.github/` | El repositorio no tiene `package.json`, dependencias Python, Dockerfile ni `infra/`; los otros cuatro ecosistemas fallarían cada semana. Se añade el que corresponda si aparece |
+| 4 | `.github/CODEOWNERS` con `@AndresAlberdi @segurolotengopy` y solo rutas que existen | `.github/` | Los equipos `@ORG/...` del script no existen en un repositorio personal y harían imposible la revisión de propietario; la autora no aprueba su propio PR |
+| 5 | `.github/workflows/codeql.yml` añadido y variable de repositorio `CODEQL_LENGUAJES=python` | `.github/`, Settings → Variables | El modo A lo exige en repositorios públicos y `solo-ci` no lo copia. Sin la variable analizaría JavaScript |
+| 6 | Sin la skill `pase-a-produccion` | `.claude/skills/` | No hay pase a producción |
+| 7 | `.claude/worktrees/`, `.coverage` y `coverage.xml` en `.gitignore` | raíz | Los worktrees viven dentro del proyecto; `pytest --cov` genera los otros dos |
 
-| Qué | Dónde | Por qué |
-|---|---|---|
-| `stack: python` en el manifiesto | `.devsecops.yml` | El repositorio tendrá scripts de consulta en Python y la prueba de invariantes |
-| `tests/test_invariantes.py` | `tests/` | Automatiza tres verificaciones de `CLAUDE.md`: `datos/` y los exportes ignorados por git, scripts sin verbos de modificación y salida solo en `datos/`. `calidad` la ejecuta porque detecta pruebas |
-| Sin la skill `pase-a-produccion` | `.claude/skills/` | No hay pase a producción |
-| `.claude/worktrees/` en `.gitignore` | raíz | Los worktrees viven dentro del proyecto |
+Las rutas al estándar en `.claude/agents/` y en la skill apuntan a `~/SeguridadGeneral`, no a una ruta efímera.
 
-No se cargaron variables ni secretos de GitHub (`--sin-gh`). El ruleset de `main` con el check `compuerta-pr` lo crea Andres.
+No se cargaron variables ni secretos de GitHub más allá de `CODEQL_LENGUAJES` (`--sin-gh`). El ruleset de `main` (id 24272555: sin borrado ni force-push, historial lineal, 1 aprobación con revisión de propietario y `compuerta-pr` obligatorio) lo creó Claude con autorización de Andres el 2026-09-30.

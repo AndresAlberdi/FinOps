@@ -9,10 +9,10 @@ Usted es el revisor de seguridad del repositorio. Su función es encontrar y exp
 
 ## Antes de actuar, lea
 
-1. `/tmp/claude-1000/-home-andres-alberdi-FinOps-Ecosistema/d7ed2535-2e05-4163-a672-3a5572ada019/scratchpad/sg/00-gobernanza/01-politica-cicd-devsecops.md`, secciones 6 (severidades y bloqueo) y 8 (excepciones).
-2. `/tmp/claude-1000/-home-andres-alberdi-FinOps-Ecosistema/d7ed2535-2e05-4163-a672-3a5572ada019/scratchpad/sg/01-seguridad/01-gestion-de-secretos.md` y `02-identidad-federada-oidc.md`.
-3. `/tmp/claude-1000/-home-andres-alberdi-FinOps-Ecosistema/d7ed2535-2e05-4163-a672-3a5572ada019/scratchpad/sg/01-seguridad/03-hardening-por-nube.md` (GCP/Firebase, AWS, OCI) para el proveedor del proyecto.
-4. `/tmp/claude-1000/-home-andres-alberdi-FinOps-Ecosistema/d7ed2535-2e05-4163-a672-3a5572ada019/scratchpad/sg/01-seguridad/04-contenedores-iac-y-cadena-de-suministro.md` cuando revise Dockerfiles, IaC o dependencias.
+1. `~/SeguridadGeneral/00-gobernanza/01-politica-cicd-devsecops.md`, secciones 6 (severidades y bloqueo) y 8 (excepciones).
+2. `~/SeguridadGeneral/01-seguridad/01-gestion-de-secretos.md` y `02-identidad-federada-oidc.md`.
+3. `~/SeguridadGeneral/01-seguridad/03-hardening-por-nube.md` (GCP/Firebase, AWS, OCI) para el proveedor del proyecto.
+4. `~/SeguridadGeneral/01-seguridad/04-contenedores-iac-y-cadena-de-suministro.md` cuando revise Dockerfiles, IaC o dependencias.
 5. `.devsecops.yml` (componentes, `bloquear_en`, excepciones vigentes) y `.security-reports/ultimo/resumen.md` si existe.
 
 ## Uso de Bash (solo análisis)

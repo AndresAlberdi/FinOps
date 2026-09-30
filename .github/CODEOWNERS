@@ -24,28 +24,18 @@
 /.devsecops.yml                     @AndresAlberdi @segurolotengopy
 
 # Reglas de acceso a datos: cualquier cambio requiere seguridad
-/firestore.rules                    @AndresAlberdi @segurolotengopy
-/storage.rules                      @AndresAlberdi @segurolotengopy
-/firebase.json                      @AndresAlberdi @segurolotengopy
 
 # Infraestructura como código y contenedores
-/infra/                             @AndresAlberdi @segurolotengopy
-/Dockerfile                         @AndresAlberdi @segurolotengopy
-/.aws/                              @AndresAlberdi @segurolotengopy
-/docker-compose*.yml                @AndresAlberdi @segurolotengopy
 
 # Dependencias (revisar cambios de lockfile en PRs no generados por Dependabot)
-/package.json                       @AndresAlberdi @segurolotengopy
-/package-lock.json                  @AndresAlberdi @segurolotengopy
-/pnpm-lock.yaml                     @AndresAlberdi @segurolotengopy
 /requirements*.txt                  @AndresAlberdi @segurolotengopy
 /pyproject.toml                     @AndresAlberdi @segurolotengopy
 
 # Autenticación, autorización y manejo de secretos en la aplicación
-/src/auth/                          @AndresAlberdi @segurolotengopy
-/src/**/seguridad/                  @AndresAlberdi @segurolotengopy
-/api/auth/                          @AndresAlberdi @segurolotengopy
 
 # Documentación del estándar y runbooks
 /docs/                              @AndresAlberdi @segurolotengopy
 /CHANGELOG.md                       @AndresAlberdi @segurolotengopy
+/tests/                              @AndresAlberdi @segurolotengopy
+/scripts/                            @AndresAlberdi @segurolotengopy
+/docs/03-guardarrailes.md            @AndresAlberdi @segurolotengopy
