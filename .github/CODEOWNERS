@@ -12,40 +12,40 @@
 # =============================================================================
 
 # Propietario por defecto de todo el repositorio
-*                                   @ORG/desarrollo
+*                                   @AndresAlberdi @segurolotengopy
 
 # Pipeline, seguridad y configuración de CI: exige al equipo de plataforma
-/.github/                           @ORG/plataforma @ORG/seguridad
-/.github/workflows/                 @ORG/plataforma @ORG/seguridad
-/.github/CODEOWNERS                 @ORG/seguridad
-/.github/dependabot.yml             @ORG/plataforma
-/.github/gitleaks.toml              @ORG/seguridad
-/.pre-commit-config.yaml            @ORG/plataforma
-/.devsecops.yml                     @ORG/plataforma @ORG/seguridad
+/.github/                           @AndresAlberdi @segurolotengopy
+/.github/workflows/                 @AndresAlberdi @segurolotengopy
+/.github/CODEOWNERS                 @AndresAlberdi @segurolotengopy
+/.github/dependabot.yml             @AndresAlberdi @segurolotengopy
+/.github/gitleaks.toml              @AndresAlberdi @segurolotengopy
+/.pre-commit-config.yaml            @AndresAlberdi @segurolotengopy
+/.devsecops.yml                     @AndresAlberdi @segurolotengopy
 
 # Reglas de acceso a datos: cualquier cambio requiere seguridad
-/firestore.rules                    @ORG/seguridad
-/storage.rules                      @ORG/seguridad
-/firebase.json                      @ORG/plataforma
+/firestore.rules                    @AndresAlberdi @segurolotengopy
+/storage.rules                      @AndresAlberdi @segurolotengopy
+/firebase.json                      @AndresAlberdi @segurolotengopy
 
 # Infraestructura como código y contenedores
-/infra/                             @ORG/plataforma
-/Dockerfile                         @ORG/plataforma
-/.aws/                              @ORG/plataforma
-/docker-compose*.yml                @ORG/plataforma
+/infra/                             @AndresAlberdi @segurolotengopy
+/Dockerfile                         @AndresAlberdi @segurolotengopy
+/.aws/                              @AndresAlberdi @segurolotengopy
+/docker-compose*.yml                @AndresAlberdi @segurolotengopy
 
 # Dependencias (revisar cambios de lockfile en PRs no generados por Dependabot)
-/package.json                       @ORG/desarrollo @ORG/plataforma
-/package-lock.json                  @ORG/desarrollo
-/pnpm-lock.yaml                     @ORG/desarrollo
-/requirements*.txt                  @ORG/desarrollo @ORG/plataforma
-/pyproject.toml                     @ORG/desarrollo @ORG/plataforma
+/package.json                       @AndresAlberdi @segurolotengopy
+/package-lock.json                  @AndresAlberdi @segurolotengopy
+/pnpm-lock.yaml                     @AndresAlberdi @segurolotengopy
+/requirements*.txt                  @AndresAlberdi @segurolotengopy
+/pyproject.toml                     @AndresAlberdi @segurolotengopy
 
 # Autenticación, autorización y manejo de secretos en la aplicación
-/src/auth/                          @ORG/seguridad @ORG/desarrollo
-/src/**/seguridad/                  @ORG/seguridad
-/api/auth/                          @ORG/seguridad @ORG/desarrollo
+/src/auth/                          @AndresAlberdi @segurolotengopy
+/src/**/seguridad/                  @AndresAlberdi @segurolotengopy
+/api/auth/                          @AndresAlberdi @segurolotengopy
 
 # Documentación del estándar y runbooks
-/docs/                              @ORG/desarrollo
-/CHANGELOG.md                       @ORG/plataforma
+/docs/                              @AndresAlberdi @segurolotengopy
+/CHANGELOG.md                       @AndresAlberdi @segurolotengopy
