@@ -33,7 +33,7 @@ Ninguna está otorgada. Cada fila dice qué se necesita, qué cuesta consultarlo
 
 - **Permisos:** `roles/billing.viewer` en la cuenta de facturación; `roles/bigquery.dataViewer` y `roles/bigquery.jobUser` sobre el dataset de la exportación.
 - **Lo urgente es activar la exportación de facturación a BigQuery, hoy sin datos.** Según la documentación oficial (https://docs.cloud.google.com/billing/docs/how-to/export-data-bigquery, 2026-09-30): en un conjunto de datos **multirregional (US o UE)** la exportación incluye los datos desde el inicio del mes anterior a la primera activación, y el llenado inicial puede tardar **hasta cinco días**; en un conjunto **regional**, solo hay datos desde la fecha de activación, sin retroactivo.
-- **Consecuencia:** se debe elegir multirregional al activar, y cada día de demora se traduce en un día menos de línea base. Sin exportación no hay dos ciclos completos que comparar.
+- **Consecuencia:** con un dataset regional (la preferencia de Andres es `us-east1`, sin multirregional) cada día de demora es un día menos de línea base, y los ciclos anteriores hay que bajarlos a mano como CSV desde la consola de facturación; con multirregional `US` el retroactivo es automático. Decide Andres (`ESTADO.md`). Sin exportación no hay dos ciclos completos que comparar.
 - **Quién activa la exportación:** un administrador de la cuenta de facturación (rol exacto: verificar en la página citada; el resumen automático no lo devolvió). No es una acción de este proyecto.
 - **Costo de consultar:** BigQuery cobra por bytes escaneados en consultas (verificar tarifa vigente en su página oficial); la exportación agregada es pequeña. Declarar bytes por consulta.
 
