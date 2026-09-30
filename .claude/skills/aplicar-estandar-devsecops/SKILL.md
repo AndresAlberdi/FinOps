@@ -9,8 +9,8 @@ Procedimiento para Claude Code. Trabaje en una rama `chore/estandar-devsecops`; 
 
 ## 0. Contexto que debe reunir antes de ejecutar nada
 
-1. Ruta local del estándar: `~/SeguridadGeneral` (confírmela con `ls ~/SeguridadGeneral/03-scripts/bootstrap-repo.sh`; si no existe, pregunte la ruta).
-2. Lea `~/SeguridadGeneral/00-gobernanza/01-politica-cicd-devsecops.md` (secciones 4 y 12: fases y mapeo v1 → v2) y `~/SeguridadGeneral/02-pipelines/README.md`.
+1. Ruta local del estándar: `/home/andres-alberdi/SeguridadGeneral` (confírmela con `ls /home/andres-alberdi/SeguridadGeneral/03-scripts/bootstrap-repo.sh`; si no existe, pregunte la ruta).
+2. Lea `/home/andres-alberdi/SeguridadGeneral/00-gobernanza/01-politica-cicd-devsecops.md` (secciones 4 y 12: fases y mapeo v1 → v2) y `/home/andres-alberdi/SeguridadGeneral/02-pipelines/README.md`.
 3. Determine el **stack real** inspeccionando el repositorio, no preguntando:
    - `package.json` + `firebase.json` → `node-firebase`
    - `requirements.txt`/`pyproject.toml` + `Dockerfile` (+ referencias a Cloud Run) → `python-cloudrun`
@@ -24,7 +24,7 @@ Procedimiento para Claude Code. Trabaje en una rama `chore/estandar-devsecops`; 
 ## 1. Ejecutar el bootstrap
 
 ```bash
-~/SeguridadGeneral/03-scripts/bootstrap-repo.sh --stack <stack> --modo <A|B|B0> --ruta-estandar ~/SeguridadGeneral
+/home/andres-alberdi/SeguridadGeneral/03-scripts/bootstrap-repo.sh --stack <stack> --modo <A|B|B0> --ruta-estandar /home/andres-alberdi/SeguridadGeneral
 ```
 
 - Responda las preguntas con datos reales del proyecto (nombre, proyectos de staging/prod, URLs); si no los conoce, use los valores por defecto y márquelos como "a confirmar" en el informe.
