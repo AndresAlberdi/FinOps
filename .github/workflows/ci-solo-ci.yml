@@ -1,0 +1,228 @@
+# =============================================================================
+# ci-solo-ci.yml — Repositorio sin despliegue: solo calidad y seguridad
+# Versión: 2.0 | Fecha: 2026-09-30
+# -----------------------------------------------------------------------------
+# Para repositorios que no despliegan nada: documentación, scripts, registros,
+# herramientas de consulta. Llega hasta la compuerta (calidad + seguridad
+# estática) y se detiene ahí: sin construir imagen, sin desplegar-*, sin DAST,
+# sin release, sin identidad federada ni variables de nube.
+#
+# Flujo:
+#   PR → main y push a main ... calidad, seguridad-estatica → compuerta-pr
+#
+# Por qué existe. Antes, un repositorio sin despliegue tenía que elegir uno de
+# los stacks que despliegan y editarle a mano la condición de `construir`
+# (ProyectosGeneral: 12 líneas de diferencia sobre ci-python-cloudrun.yml). Ese
+# cambio propio choca con cada actualización del estándar, y si se olvida,
+# `desplegar-staging` corre en el push a main, no encuentra la identidad
+# federada y deja main en rojo (PRETSO, 2026-09-21).
+#
+# `calidad` mira qué hay en el repositorio (git ls-files) y comprueba solo eso:
+#   *.py ................ ruff (lint y formato)
+#   pruebas de Python ... pytest y cobertura mínima (COVERAGE_MIN)
+#   *.sh ................ ShellCheck (severidad warning)
+#   .github/workflows ... actionlint (siempre hay: los del propio estándar)
+# Todo lo que está en `.github/` es copia del estándar —validar-manifiesto.py,
+# evaluar-zap.py— y ya lo comprueba el CI de SeguridadGeneral: se excluye de ruff
+# y de la detección de Python. Sin esa exclusión, `ruff format
+# --check` falla en todo repositorio nuevo porque esos scripts no siguen el
+# formato por defecto de ruff.
+# La seguridad (gitleaks, Semgrep, Trivy fs, auditoría nativa, IaC si hay) la da
+# el reusable, con `stack: auto`.
+#
+# Variables (todas opcionales): PYTHON_VERSION (3.12), COVERAGE_MIN (70),
+#            BLOQUEAR_EN (CRITICAL,HIGH), GHAS_ENABLED
+# Secretos (opcionales, solo si el repositorio es de una organización o usa
+# Snyk): GITLEAKS_LICENSE, SNYK_TOKEN
+# =============================================================================
+name: CI solo-ci (sin despliegue)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  PYTHON_VERSION: ${{ vars.PYTHON_VERSION || '3.12' }}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Fase 1 — calidad: solo lo que el repositorio realmente tiene.
+  # ---------------------------------------------------------------------------
+  calidad:
+    name: calidad
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      COVERAGE_MIN: ${{ vars.COVERAGE_MIN || 70 }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # El job ejecuta código del repositorio (pytest): el token no tiene por
+          # qué quedar en .git/config a su alcance.
+          persist-credentials: false
+
+      # La salida de git se captura primero: si git falla, el paso falla (set -e)
+      # en vez de dar «no hay nada» y pasar en verde sin comprobar. Los flags se
+      # calculan con [[ -n ]] sobre esa salida, sin `| grep -q` ni `| head`: bajo
+      # pipefail esas tuberías cortan la lectura y devuelven 141 (SIGPIPE).
+      - name: Detectar qué hay que comprobar
+        id: detectar
+        run: |
+          set -euo pipefail
+          py="$(git ls-files -- '*.py' ':(exclude).github')"
+          sh="$(git ls-files -- '*.sh')"
+          wf="$(git ls-files -- '.github/workflows/*.yml' '.github/workflows/*.yaml')"
+          # Las convenciones por defecto de pytest (test_*.py y *_test.py). Con
+          # :(glob), `*` no cruza directorios: una carpeta test_datos/ con
+          # cargar.py dentro NO cuenta, y `mytest_helper.py` tampoco; pytest no los
+          # recoge y saldría «no tests ran».
+          pruebas="$(git ls-files -- ':(glob)test_*.py' ':(glob)**/test_*.py' ':(glob)*_test.py' ':(glob)**/*_test.py' ':(exclude).github')"
+
+          gestor=""
+          if   [[ -f uv.lock ]];              then gestor="uv";     instalar="pip install uv && uv sync --frozen --all-extras"
+          elif [[ -f poetry.lock ]];          then gestor="poetry"; instalar="pip install poetry && poetry install --no-interaction"
+          elif [[ -f requirements-dev.txt ]]; then
+            gestor="pip"; instalar="pip install -r requirements-dev.txt"
+            if [[ -f requirements.txt ]]; then instalar="pip install -r requirements.txt -r requirements-dev.txt"; fi
+          elif [[ -f requirements.txt ]];     then gestor="pip"; instalar="pip install -r requirements.txt"
+          else instalar=""; fi
+
+          contar() { if [[ -z "$1" ]]; then echo 0; else printf '%s\n' "$1" | wc -l; fi; }
+          marca() { if [[ -n "$1" ]]; then echo true; else echo false; fi; }
+          {
+            echo "python=$(marca "$py")"
+            echo "shell=$(marca "$sh")"
+            echo "workflows=$(marca "$wf")"
+            echo "pruebas=$(marca "$pruebas")"
+            echo "gestor=$gestor"
+            echo "instalar=$instalar"
+          } >> "$GITHUB_OUTPUT"
+          echo "Python: $(contar "$py") · shell: $(contar "$sh") · workflows: $(contar "$wf") · archivos de prueba: $(contar "$pruebas")"
+          echo "Instalación de dependencias: ${instalar:-ninguna}"
+
+      - name: Python
+        if: steps.detectar.outputs.python == 'true'
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Instalar dependencias
+        if: steps.detectar.outputs.python == 'true' && steps.detectar.outputs.instalar != ''
+        env:
+          INSTALAR: ${{ steps.detectar.outputs.instalar }}
+        run: |
+          set -euo pipefail
+          bash -c "$INSTALAR"
+
+      - name: Ruff (lint y formato)
+        if: steps.detectar.outputs.python == 'true'
+        run: |
+          set -euo pipefail
+          pip install --quiet ruff
+          ruff check --extend-exclude .github .
+          ruff format --check --extend-exclude .github .
+
+      # Con uv o poetry las dependencias viven en el entorno que crea el gestor: pytest
+      # se instala y se ejecuta ahí, no con el pip del sistema (que no las ve y
+      # fallaría al importarlas). Medido: coverage no mide los directorios ocultos,
+      # así que los scripts copiados en .github/ no bajan el porcentaje.
+      - name: Pytest con cobertura mínima
+        if: steps.detectar.outputs.pruebas == 'true'
+        env:
+          GESTOR: ${{ steps.detectar.outputs.gestor }}
+        run: |
+          set -euo pipefail
+          case "$GESTOR" in
+            uv)     uv pip install --quiet pytest pytest-cov; prefijo=(uv run --no-sync) ;;
+            poetry) poetry run pip install --quiet pytest pytest-cov; prefijo=(poetry run) ;;
+            *)      pip install --quiet pytest pytest-cov; prefijo=() ;;
+          esac
+          # --cov-fail-under hace fallar pytest si no se alcanza el umbral.
+          "${prefijo[@]}" pytest --cov=. --cov-report=term --cov-fail-under="$COVERAGE_MIN" -q
+          echo "### Cobertura mínima exigida: $COVERAGE_MIN %" >> "$GITHUB_STEP_SUMMARY"
+
+      # shellcheck ya viene en el runner. Severidad warning: lo que rompe o
+      # puede romper, no el estilo.
+      - name: ShellCheck
+        if: steps.detectar.outputs.shell == 'true'
+        run: |
+          set -euo pipefail
+          git ls-files -z -- '*.sh' | xargs -0 shellcheck --severity=warning
+
+      # El repositorio se monta de solo lectura en una imagen de terceros, fijada
+      # por digest: actionlint solo lee.
+      - name: actionlint
+        if: steps.detectar.outputs.workflows == 'true'
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$PWD:/repo:ro" -w /repo rhysd/actionlint:1.7.7@sha256:887a259a5a534f3c4f36cb02dca341673c6089431057242cdc931e9f133147e9
+
+      - name: Resumen
+        env:
+          PYTHON: ${{ steps.detectar.outputs.python }}
+          PRUEBAS: ${{ steps.detectar.outputs.pruebas }}
+          SHELL_SH: ${{ steps.detectar.outputs.shell }}
+          WORKFLOWS: ${{ steps.detectar.outputs.workflows }}
+        run: |
+          {
+            echo "### calidad (solo-ci)"
+            echo "- ruff: $PYTHON · pytest: $PRUEBAS · shellcheck: $SHELL_SH · actionlint: $WORKFLOWS"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # Fase 2 — seguridad-estatica (reusable; ruta local en el repo del proyecto).
+  # ---------------------------------------------------------------------------
+  seguridad-estatica:
+    name: seguridad-estatica
+    permissions:
+      contents: read
+      # security-events: write solo lo usa el reusable cuando subir_sarif = true.
+      # Sin pull-requests: write: los escáneres no comentan en el PR.
+      security-events: write
+      actions: read
+    uses: ./.github/workflows/_reusable-security.yml
+    with:
+      ruta: '.'
+      stack: auto
+      bloquear_en: ${{ vars.BLOQUEAR_EN || 'CRITICAL,HIGH' }}
+      subir_sarif: ${{ github.event.repository.visibility == 'public' || vars.GHAS_ENABLED == 'true' }}
+    # Mínimo privilegio: solo los dos secretos que el reusable declara en
+    # `on.workflow_call.secrets` (ambos opcionales). Nunca `secrets: inherit`.
+    secrets:
+      GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+  # ---------------------------------------------------------------------------
+  # compuerta-pr (D1): ÚNICO status check que exigen los rulesets de main.
+  # ---------------------------------------------------------------------------
+  compuerta-pr:
+    name: compuerta-pr
+    needs: [calidad, seguridad-estatica]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verificar resultados de calidad y seguridad-estatica
+        env:
+          R_CALIDAD: ${{ needs.calidad.result }}
+          R_SEGURIDAD: ${{ needs.seguridad-estatica.result }}
+        run: |
+          set -euo pipefail
+          echo "calidad=$R_CALIDAD | seguridad-estatica=$R_SEGURIDAD"
+          for r in "$R_CALIDAD" "$R_SEGURIDAD"; do
+            if [[ "$r" != "success" ]]; then
+              echo "::error::compuerta-pr bloqueada: algún job requerido no terminó en success"
+              exit 1
+            fi
+          done
+          echo "compuerta-pr: aprobada"

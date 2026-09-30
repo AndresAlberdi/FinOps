@@ -29,3 +29,16 @@ __pycache__/
 .pytest_cache/
 .security-reports/
 .trivy-cache/
+.deploy-log/
+serviceAccountKey*.json
+*-sa-key.json
+tfplan*
+.terraform/
+*.tfstate*
+*.auto.tfvars
+secrets.tfvars
+.trivyignore.yaml
+.gitleaksignore
+
+# Worktrees de Claude Code
+.claude/worktrees/
