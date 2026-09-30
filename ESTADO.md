@@ -6,7 +6,7 @@
 
 Condición de Claude: consumir el equivalente a 1 semana en 40 horas. Ventana de 40 h iniciada ~2026-09-30 19:00 UTC con la cuota semanal en 4 % y plan Max (ver `mediciones/claude/2026-09-linea-base.md` §3 y §6).
 
-Hecho al reanudar: fase 2b consolidada en `informes/2026-09-29.md` (faltan NovuChat y Claude-Proyectos, que no escribieron su sección); PR de modelos al día; ver pendientes abajo.
+Hecho al reanudar (2026-09-30): fase 2b consolidada en `informes/2026-09-29.md` (faltan NovuChat y Claude-Proyectos); Bloque 1: registro de servicios (`docs/01` §2) y políticas de acceso preparadas (`docs/04` §2); todo en `origin/main` (`75ce5fd`). Bloque 0 en espera de SeguridadGeneral (no existe stack sin despliegue). Bloque 2 bloqueado: no hay acceso de lectura a ninguna facturación.
 
 Commits locales sin subir a `origin`: todos desde `00df548`. Subirlos es rutina (`git push origin main`).
 
@@ -32,10 +32,13 @@ Commits locales sin subir a `origin`: todos desde `00df548`. Subirlos es rutina 
 - Fase 1: hecha, commit local `ef0e7a7` — `WebFetch` quitado de los tres agentes (valor por defecto del estándar, reversible): `analista-finops` conserva `WebSearch`; `guardian-calidad-seguridad` pasa de `WebFetch` a `WebSearch`; `recolector-costos` queda sin red (usa CLI por `Bash`; tiene acceso a credenciales de nube, Regla de Dos). Modelos: `recolector-costos` haiku, los otros dos opus. Sin PR: no hay remoto.
 - Fase 2a: en curso — método y primer dato en `mediciones/claude/2026-09-linea-base.md`. **La cuenta es plan Pro, no Max.** Semanal: 84 % usado a 2 d 18 h de renovar (02/10 08:00 UTC).
 - Fase 2b: pendiente al cierre de la jornada (leer la fila «Costo» de los otros seis `ESTADO.md` y consolidarla en `informes/2026-09-29.md`).
-- Requiere a Andres:
-  - Abrir una sesión nueva desde el botón de la app, sin escribir `/model`, y avisarme: leo su modelo de arranque con `get_session`. Con eso A queda confirmada o no.
-  - Con 84 % de la cuota semanal usada y siete sesiones en paralelo, decidir si alguna espera al 02/10.
-- v2-A (sesión principal en Sonnet): **NO confirmada** (verificado 2026-09-29 con `get_session`: solo da el modelo actual, no el de arranque; ninguna sesión nueva abierta por Andres tras su prueba; dos siguen en opus). Detalle en `mediciones/claude/2026-09-linea-base.md` §5. `~/.claude/settings.json` sin clave `model`, sin cambios desde 2026-09-25.
+- Requiere a Andres (por orden de importancia):
+  - **Activar la exportación de facturación a BigQuery, en un conjunto de datos multirregional (US o UE), en las tres cuentas de Google.** Hoy no hay datos y cada día de demora recorta la línea base (detalle en `docs/04-accesos.md` §2.2). Es acción de un administrador de la cuenta de facturación.
+  - Rol de solo lectura en AWS (`docs/04` §2.1): una línea, cuando decidas.
+  - Abrir una sesión nueva desde el botón de la app, sin escribir `/model`, y avisarme: leo su modelo de arranque con `get_session` (palanca A sigue sin confirmar).
+  - Responder a SeguridadGeneral (mensaje en cola) si define un stack sin despliegue para aplicar el estándar aquí; hasta entonces el Bloque 0 espera. La orden general deja `bootstrap-repo.sh` fuera de la autorización.
+  - Informar a NovuChat y Claude-Proyectos que escriban su sección «Coordinación 2026-09-29» (no la encontré en ningún `ESTADO.md` ni worktree).
+  - Borrar o conservar `AndresAlberdi/FinOpsEcosistema` (vacío): decisión tuya.
 - Costo: esta sesión arrancó en Opus 5.5 y pasó a Sonnet 5.5 el 2026-09-29 por `/model` de Andres; antes (se abrió antes de la orden; no se cambió el modelo desde aquí); consumo de hoy: lectura de la orden, 3 ediciones y 1 documento; 0 consultas pagas.
 
 ## Hecho
