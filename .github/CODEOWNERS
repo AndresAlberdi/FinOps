@@ -23,15 +23,9 @@
 /.pre-commit-config.yaml            @AndresAlberdi @segurolotengopy
 /.devsecops.yml                     @AndresAlberdi @segurolotengopy
 
-# Reglas de acceso a datos: cualquier cambio requiere seguridad
-
-# Infraestructura como código y contenedores
-
 # Dependencias (revisar cambios de lockfile en PRs no generados por Dependabot)
 /requirements*.txt                  @AndresAlberdi @segurolotengopy
 /pyproject.toml                     @AndresAlberdi @segurolotengopy
-
-# Autenticación, autorización y manejo de secretos en la aplicación
 
 # Documentación del estándar y runbooks
 /docs/                              @AndresAlberdi @segurolotengopy
