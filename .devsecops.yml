@@ -1,0 +1,18 @@
+# Manifiesto del estándar DevSecOps (esquema: 02-pipelines/config/devsecops.schema.json;
+# convenciones: 00-gobernanza/00-convenciones.md; generado por bootstrap-repo.sh v2.2)
+version: 1
+proyecto: finops-ecosistema
+modo: A            # A | B | B0 (ver 00-gobernanza/03-ambientes-modos-y-aprobaciones.md)
+produccion: false        # este repositorio no despliega; en B0 lo hace permanente (sin fecha_modo)
+cobertura_minima: 70
+componentes:
+  - nombre: finops-ecosistema
+    ruta: ./
+    stack: python           # static | python | node: el que describa el código de este repositorio
+    proveedor: ninguno
+    ambientes: {}               # sin despliegue no hay ambientes (el esquema exige la clave)
+seguridad:
+  dast: false                     # sin despliegue no hay nada contra lo que correr ZAP
+  bloquear_en: [CRITICAL, HIGH]   # se puede endurecer (añadir MEDIUM), nunca relajar
+  # id, herramienta, componente, justificacion, aprobado_por, creado, vence
+  excepciones: []
