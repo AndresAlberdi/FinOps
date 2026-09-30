@@ -1,23 +1,14 @@
 # ESTADO — FinOps-Ecosistema
 
-**Última actualización:** 2026-09-29 (sesión detenida por orden de Andres hasta el 2026-10-02)
+**Última actualización:** 2026-09-30
 
-## ⏸ DETENIDA hasta el 2026-10-02 (orden de Andres, 2026-09-29)
+## ▶ REANUDADA 2026-09-30 (Andres consiguió créditos)
 
-**No hacer nada en este proyecto antes del 2026-10-02**, salvo que Andres lo pida en el chat. Motivo: la cuota semanal del plan estaba en 84 % con renovación el 2026-10-02 08:00 UTC.
+Condición de Claude: consumir el equivalente a 1 semana en 40 horas. Ventana de 40 h iniciada ~2026-09-30 19:00 UTC con la cuota semanal en 4 % y plan Max (ver `mediciones/claude/2026-09-linea-base.md` §3 y §6).
 
-Al reabrir, en este orden:
-1. Leer este archivo y `mediciones/claude/2026-09-linea-base.md`.
-2. **Lectura de cuota justo antes de la renovación** (`get_usage`): es el dato de la semana 25/09–02/10. Anotarlo en la tabla §3.
-3. **Fase 2b pendiente:** consolidar en `informes/2026-09-29.md` la fila «Costo» de la sección `## Coordinación 2026-09-29` de los `ESTADO.md` de SeguridadGeneral, Claude-Proyectos, segurolotengo-demo, PRETSO, NovuChat y WhatsApp-Modular (solo lectura; decir en el chat qué se leyó).
-4. **Palanca A sigue «verificar»:** falta la prueba limpia (sesión nueva desde el botón de la app, sin `/model`; leer su `model` con `get_session`). Si Andres la hizo, avisar a SeguridadGeneral con el resultado (su PR #41 y su `HISTORIAL.md` la esperan).
-5. Después: Bloque 2 acotado (comparar la semana 02/10–09/10 contra la del 25/09), corregir «Max» por «Pro» en `docs/00` y `docs/01`, y Bloque 0 (estándar DevSecOps) ahora que el remoto existe.
+Hecho al reanudar: fase 2b consolidada en `informes/2026-09-29.md` (faltan NovuChat y Claude-Proyectos, que no escribieron su sección); PR de modelos al día; ver pendientes abajo.
 
-Estado al detenerse:
-- Repositorio: `git@github.com:AndresAlberdi/FinOps.git` (GEN, público), `main` en origin en `c18f79c`; **hay commits locales sin subir** (hasta `69cd1d2`, mediciones y estado). Subirlos requiere `git push` a `origin main`.
-- Sin `AndresAlberdi/FinOpsEcosistema`: quedó vacío; borrarlo lo decide Andres.
-- Agentes: `recolector-costos` haiku sin `WebFetch`; `analista-finops` y `guardian-calidad-seguridad` opus, sin `WebFetch`. Cambios ya confirmados en `main`.
-- Sin tareas en curso ni agentes lanzados. Nada pendiente de aprobación de Andres salvo lo de «Requiere a Andres» de más abajo.
+Commits locales sin subir a `origin`: todos desde `00df548`. Subirlos es rutina (`git push origin main`).
 
 ## Punto de retorno (leer primero al abrir una sesión)
 

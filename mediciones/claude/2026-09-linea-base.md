@@ -6,7 +6,7 @@
 
 ## 1. Qué se mide y por qué así
 
-La cuenta usa el **plan Pro** (no Max, como suponían `docs/00` §2 y `docs/01` §1; corregir en el Bloque 1). En un plan de suscripción el costo en USD es fijo; lo que la palanca reduce es el **consumo de cuota**: porcentaje de la ventana semanal «todos los modelos» y de la de Fable, y las veces que se toca el límite. El ahorro se expresa como: menos cuota por unidad de trabajo, o la misma cuota para más trabajo, sin regresión de calidad.
+`get_usage` reportó **plan Pro** el 2026-09-29 y **plan Max** el 2026-09-30 (ver §3): el plan cambió entre ambas lecturas (créditos o mejora de plan, según Andres, condiciones de Claude: consumir en 40 horas el equivalente a una semana). `docs/00` §2 y `docs/01` §1 dicen Max, lo cual vuelve a coincidir; no hay nada que corregir por ahora. En un plan de suscripción el costo en USD es fijo; lo que la palanca reduce es el **consumo de cuota**: porcentaje de la ventana semanal «todos los modelos» y de la de Fable, y las veces que se toca el límite. El ahorro se expresa como: menos cuota por unidad de trabajo, o la misma cuota para más trabajo, sin regresión de calidad.
 
 ## 2. Fuente y método (reproducible)
 
@@ -24,7 +24,8 @@ La cuenta usa el **plan Pro** (no Max, como suponían `docs/00` §2 y `docs/01` 
 
 | Fecha y hora (UTC) | Ventana 5 h | Semanal, todos los modelos | Semanal, Fable | Uso extra | Nota |
 |---|---|---|---|---|---|
-| 2026-09-29 13:44 | 12 % | **84 %** | 73 % | desactivado (tope USD 40) | Faltan 2 d 18 h para renovar; 6 sesiones prioritarias activas en paralelo |
+| 2026-09-29 13:44 | 12 % | **84 %** | 73 % | desactivado (tope USD 40) | Plan: Pro. Faltan 2 d 18 h para renovar; 6 sesiones prioritarias activas en paralelo |
+| 2026-09-30 18:57 | 14 % | **4 %** | 0 % | desactivado (tope USD 40) | Plan: **Max**. Renueva 2026-10-02 08:00 UTC. La ventana semanal se reinició con los créditos; condición de Andres: consumir el equivalente a 1 semana en 40 h |
 
 ## 4. Límites de esta línea base
 
@@ -49,3 +50,7 @@ Fuente: `get_session` (metadatos; no lee conversaciones). **El campo `model` es 
 **Prueba limpia pendiente:** Andres abre una sesión nueva desde el botón de la app (sin escribir `/model`) y FinOps lee su `model` con `get_session` de inmediato. Si dice `claude-sonnet-5-5`, A queda confirmada con esa hora.
 
 **Cuota por modelo:** `get_usage` no separa por modelo salvo la ventana «Weekly · Fable» (73 %, no se sabe qué modelos incluye); no permite fijar desde qué hora cambió el consumo.
+
+## 6. Ventana de 40 horas (desde 2026-09-30)
+
+Andres consiguió créditos con la condición de consumir el equivalente a una semana en 40 horas. La comparación semanal del §2 pierde sentido mientras dure: la unidad pasa a ser la **ventana de 40 h**. Se anota el `% semanal` al inicio y al fin, las horas reales y los PR fusionados en ese lapso. Inicio de la ventana: 2026-09-30 ~19:00 UTC (4 % usado). Fin: a las 40 h de trabajo efectivo o al agotarse el crédito, lo que ocurra antes (la fecha exacta la confirma Andres; verificar en las condiciones de Claude).
