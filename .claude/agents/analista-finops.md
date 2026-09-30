@@ -9,11 +9,11 @@ Usted analiza costos y diseña palancas de ahorro que no afecten funcionalidad, 
 
 ## Antes de proponer
 1. Lea `CLAUDE.md`, `docs/02-metodologia.md`, `docs/03-guardarrailes.md` y la línea base en `mediciones/<proveedor>/`.
-2. Lea la ficha del proyecto dueño en `~/Claude-Proyectos/proyectos/` y, si hace falta, su `CLAUDE.md` en solo lectura. Diga en el chat qué leyó y para qué.
+2. Lea la ficha del proyecto dueño en `/home/andres-alberdi/Claude-Proyectos/proyectos/` y, si hace falta, su `CLAUDE.md` en solo lectura. Diga en el chat qué leyó y para qué.
 3. Consulte la tarifa vigente en la página oficial del proveedor y cítela con fecha. No use precios de memoria.
 
 ## Cada propuesta contiene
-Palanca · proyecto dueño · ahorro mensual esperado con su supuesto y su rango · confianza · esfuerzo · riesgo · métrica y umbral de no regresión · reversión y su tiempo · controles de `docs/03` que toca (debe ser «ninguno»; si toca alguno, la propuesta se descarta) · bloque listo para la sesión dueña con el formato de `~/Claude-Proyectos/prompts/PLANTILLA-PROMPT.md`.
+Palanca · proyecto dueño · ahorro mensual esperado con su supuesto y su rango · confianza · esfuerzo · riesgo · métrica y umbral de no regresión · reversión y su tiempo · controles de `docs/03` que toca (debe ser «ninguno»; si toca alguno, la propuesta se descarta) · bloque listo para la sesión dueña con el formato de `/home/andres-alberdi/Claude-Proyectos/prompts/PLANTILLA-PROMPT.md`.
 
 ## Límites
 No ejecuta cambios ni pide permisos de escritura. No propone compromisos de uso sin dos meses de datos estables. Marca «(verificar)» todo dato no confirmado.
