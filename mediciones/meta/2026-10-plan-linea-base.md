@@ -40,6 +40,29 @@
 - **Riesgo de cobertura:** la WABA de Bellido está en el portafolio de otra persona. Un usuario de sistema creado en el portafolio de Andres **no la verá** salvo que el doctor comparta el acceso. Se anota para decidirlo con el contrato de Bellido («quién paga Meta», pendiente de su cliente).
 - **Estimación por inquilino:** solo existe la tarifa de referencia (0,0113 USD por mensaje saliente de Bolivia desde el 01/10); la de cartera, con bolsas de prueba de 20 mensajes para Bellido y 100 para Platinum, no está escrita.
 
+## Inventario de cuentas (WABA), de WhatsApp-Modular, 2026-10-01 (solo últimos 4 dígitos)
+
+13 WABA en 5 portafolios, medidas por Graph API con el token de AAB1 (solo lectura). **Lo que cuesta dinero a Andres** es lo de los portafolios cuya tarjeta es suya.
+
+| Portafolio | WABA | Qué es | Línea | ¿La mide FinOps? |
+|---|---|---|---|---|
+| AAB1 | …2820 | Propia; OTP de SeguroLoTengo (pilotos, temporal: pasará a Interseguros) | 1 | **Sí** |
+| AAB1 | …4125 «NovuChat» | **Del cliente** (portafolio de Silvana): chat interno | 1 (USD) | No con token de AAB1: necesita el acceso del dueño |
+| AAB1 | …1573 «Segurolotengo» | **De Interseguros** | 1 | No: el costo es del dueño, no de Andres |
+| AAB1, NovuChat Producción, Dr. Bellido, Segurolotengo | …3881, …2898, …4919, …8154 | **De prueba**, bloqueadas por el código 141006 | 0 | No se usan |
+| NovuChat Producción (tarjeta de Andres) | …7545 «Clínica Platinum» | Cliente de NovuChat | 1 | **Sí** |
+| NovuChat Producción | …1048 «NovuChat» | Demostración y captación; hoy sin uso | 1 | **Sí** |
+| NovuChat Producción | …8189 «AndresBellido-Asistente» | **Huérfana**, sin líneas; su saldo es en dirhams (AED), la única que no está en dólares | 0 | Revisar saldo y cierre |
+| NovuChat Producción | …0348 | Sin líneas | 0 | No |
+| Dr. Andrés Bellido | …3951 | Cliente de NovuChat (pediatra) | 1 | Solo si el doctor comparte el acceso |
+
+**Alcance real de una primera lectura: 3 WABA con tráfico** (…2820, …7545, …1048), más …3951 si el doctor da acceso. Un usuario de sistema pertenece a **un** portafolio: harán falta **dos** (AAB1 y NovuChat Producción), cada uno con su token, y un tercero si el doctor comparte la cuenta de Bellido.
+
+## Dos hallazgos de tarifas (de WhatsApp-Modular, a verificar)
+
+- **Categoría de plantilla: una palanca real de ahorro.** Una plantilla propia pedida como UTILITY fue **recategorizada por Meta a MARKETING**, que cuesta 6,5 veces más (0,0740 frente a 0,0113 USD por mensaje). Las plantillas de la biblioteca de Meta conservan UTILITY. Es la palanca «categoría correcta de plantilla» de `docs/02` §3. Para proponerla hace falta medir con `pricing_analytics` cuánto volumen cae en MARKETING; no se propone nada sin medir (invariante 8).
+- **Fuentes de la tarifa.** La franquicia de 1.000 mensajes de servicio gratis por línea y mes sale de **fuentes secundarias** (la página oficial de Meta no la detalla). Las tarifas de Bolivia (0,0113 / 0,0113 / 0,0740) vienen de Twilio con fecha 23/09: **verificar con la tarjeta de tarifas del WhatsApp Manager** antes de usarlas en una propuesta (invariante 7).
+
 ## Límites y riesgos
 
 - **Cuántas WABA y en qué portafolios:** desconocido; se pidió el inventario a WhatsApp-Modular y a NovuChat. Sin él no se puede decir si un solo token alcanza a todas.
