@@ -210,7 +210,7 @@ SUBPROCESO_ESCRIBE = {
     "add-iam-policy-binding", "set-iam-policy",
 }  # fmt: skip
 ESCRIBE_ARCHIVO = re.compile(
-    r"\.(?:write_text|write_bytes|touch|mkdir|unlink|rmdir|rename|replace)\(|"
+    r"\.(?:write_text|write_bytes|touch|mkdir|unlink|rmdir|rename)\(|Path\([^)]*\)\.replace\(|"
     r"\.to_(?:csv|json|parquet|excel|pickle|feather|sql)\(|"
     r"\bopen\([^)]*?(?:,\s*|mode\s*=\s*)['\"][wax][bt+]*['\"]|"
     r"\bshutil\.(?:rmtree|copy\w*|move)\(|\bos\.(?:remove|rename|system|unlink|makedirs)\("
@@ -338,6 +338,7 @@ PY_DEBE_FALLAR = (
     "requests.post(url)",
     "subprocess.run(['aws', 's3', 'rm', 's3://b/x'])",
     "subprocess.run(['rm', '-rf', 'x'])",
+    "Path('/tmp/x').replace('/tmp/y')",
 )
 PY_NO_DEBE_FALLAR = (
     "def f() -> int:",
@@ -351,6 +352,7 @@ PY_NO_DEBE_FALLAR = (
     "subprocess.run(['aws', 's3', 'ls'])",
     "parser.add_argument('--x')",
     "df = df.set_index('a')",
+    "limpio = texto.replace('Z', '+00:00')",
 )
 
 
