@@ -2,7 +2,7 @@
 
 | Versión | Fecha | Estado |
 |---|---|---|
-| 0.1 | 2026-10-01 | Plan y herramienta listos; falta el token de solo lectura y la lista de cuentas (WABA) |
+| 0.2 | 2026-10-01 | Primera línea base de septiembre obtenida vía WhatsApp-Modular; ya no hace falta un token propio de FinOps |
 
 ## Por qué este proveedor es distinto
 
@@ -24,44 +24,36 @@
 - **`scripts/meta/guardar_token.sh`:** guarda el token en `datos/meta/token` (permiso 600) desde un prompt oculto; el valor no pasa por el chat.
 - **10 pruebas** con respuestas simuladas, incluida la de que el token y el ID completo nunca se imprimen. El guardián de invariantes del proyecto, que analiza los scripts reales, ya detectó y obligó a corregir una ruta no literal en el primero.
 
-## Qué hace falta de Andres (pasos que solo una persona puede dar en Meta)
+## Línea base de septiembre 2026 (primera medición real)
 
-1. En **Meta Business Suite → Configuración del negocio → Usuarios → Usuarios del sistema**: crear un usuario de sistema `finops-lectura` con rol de empleado (no administrador).
-2. **Asignarle las cuentas de WhatsApp (WABA)** con acceso parcial de solo lectura, una por una. Hay que hacerlo en **cada portafolio** que tenga cuentas.
-3. **Generar un token** con el permiso `whatsapp_business_management` (verificar si la analítica de precios exige también `whatsapp_business_messaging`). Preferir **caducidad de 60 días** a «nunca», con rotación.
-4. Guardar el token con `scripts/meta/guardar_token.sh` (Claude lo lanza en una pestaña de su terminal y Andres lo pega en el prompt oculto).
-5. Pasar la lista de IDs de WABA (por mensaje, no en archivos versionados) para `datos/meta/wabas.txt`.
+Fuente: comando de solo lectura `npm run costos:meta` de WhatsApp-Modular (PR segurolotengopy/WhatsAppModular#130, pendiente de fusión), corrido el 2026-10-01 con el token de usuario de AAB1 **re-emitido ese día** (cubre las 11 WABA, vence el 2026-11-30). **Ningún token sale de ese proyecto**; a FinOps llegan solo agregados por mensaje. Cifras en USD.
 
-## Lo que respondió NovuChat (2026-10-01, solo lectura de su respuesta)
-
-- **El objeto `pricing` del webhook de estado NO se guarda:** NovuChat descarta los acuses de estado. La conciliación mensaje a mensaje no es posible con lo que se guarda hoy; **`pricing_analytics` es la fuente real.**
-- **Cuentas (WABA), sin cifras exactas:** una compartida con WhatsApp-Modular (la del Demo A, con las apps `NovuChat-Demo-A` y `Demo SeguroLo Tengo`), una propia `NovuChat` (chat interno y Demo B), **una de Bellido en el portafolio de su doctor** (el doctor aún no aceptó ser administrador; hay una app y una WABA huérfanas) y una de demo (Platinum). Los alias y el número exacto viven en un archivo local que ninguna sesión lee; los tiene la sesión de cartera o Andres.
-- **Meta no ofrece alerta de gasto para Cloud API** (verificado por Andres en pantalla el 30/09). Por eso `pricing_analytics` es el **único** control de gasto disponible y justifica la revisión mensual.
-- **Riesgo de cobertura:** la WABA de Bellido está en el portafolio del doctor (invitación de administrador pendiente). Un usuario de sistema creado en otro portafolio **no la verá**. Hoy la paga Andres; «quién paga Meta» a partir del piloto queda para el contrato de Bellido.
-- **Estimación por inquilino:** solo existe la tarifa de referencia (0,0113 USD por mensaje saliente de Bolivia desde el 01/10); la de cartera, con bolsas de prueba de 20 mensajes para Bellido y 100 para Platinum, no está escrita.
-
-## Inventario de cuentas (WABA), de WhatsApp-Modular, 2026-10-01 (solo últimos 4 dígitos)
-
-13 WABA en 5 portafolios, medidas por Graph API con el token de AAB1 (solo lectura). **Hoy Andres paga el consumo de las WABA de Bellido y de Interseguros** (todavía no son de ellos), además de las suyas: todas con tráfico entran en la medición.
-
-| Portafolio | WABA | Qué es | Línea | ¿La mide FinOps? |
+| WABA | Paga | Mensajes en septiembre | Costo | Tipo de cifra |
 |---|---|---|---|---|
-| AAB1 | …2820 | Propia; OTP de SeguroLoTengo (pilotos, temporal: pasará a Interseguros) | 1 | **Sí** |
-| AAB1 | …4125 «NovuChat» | **Del portafolio de Silvana** (chat interno); no consta quién la paga | 1 (USD) | Pendiente de saber quién paga; el token de AAB1 no la lee |
-| AAB1 | …1573 «Segurolotengo» | **De Interseguros, pero la paga Andres por ahora** (la de SeguroLoTengo en producción) | 1 | **Sí**, pero el token de AAB1 no la lee (error #100): hace falta otro acceso |
-| AAB1, NovuChat Producción, Dr. Bellido, Segurolotengo | …3881, …2898, …4919, …8154 | **De prueba**, bloqueadas por el código 141006 | 0 | No se usan |
-| NovuChat Producción (tarjeta de Andres) | …7545 «Clínica Platinum» | Cliente de NovuChat | 1 | **Sí** |
-| NovuChat Producción | …1048 «NovuChat» | Demostración y captación; hoy sin uso | 1 | **Sí** |
-| NovuChat Producción | …8189 «AndresBellido-Asistente» | **Huérfana**, sin líneas; su saldo es en dirhams (AED), la única que no está en dólares | 0 | Revisar saldo y cierre |
-| NovuChat Producción | …0348 | Sin líneas | 0 | No |
-| Dr. Andrés Bellido | …3951 | Cliente de NovuChat (pediatra); **la paga Andres hoy** | 1 | **Sí**; está en el portafolio del doctor (invitación de administrador pendiente) |
+| …2820 AAB1 (OTP de SeguroLoTengo) | Andres | 5 (3 de autenticación pagados, 2 de servicio gratis) | **0,0339** | **Real** (Meta) |
+| …1573 Interseguros | Andres | 1 (servicio, gratis) | 0 | — |
+| …7545 Clínica Platinum | Andres | 262 (servicio, gratis) | 0 | — |
+| …1048 NovuChat | Andres | 94 (84 de servicio y 4 de utilidad gratis; 1 de utilidad pagado; 5 de servicio a Alemania sin tarifa) | 0,0113 | Estimado |
+| …3951 Dr. Bellido | Andres | 214 (servicio, gratis) | 0 | — |
+| …4125 NovuChat (Silvana) | **Silvana** | 29 (servicio, utilidad; 6 a EE. UU. sin tarifa) | 0 | — |
+| **Total Andres** | | **598** | **0,0565** (real 0,0452; estimado 0,0113) | |
+| Total Silvana | | 30 | 0 | |
 
-**Alcance real: 5 WABA con tráfico que paga Andres** (…2820, …1573, …7545, …1048 y …3951), más …4125 si resulta que también la paga él. Están repartidas en **cuatro portafolios** (AAB1, NovuChat Producción, Dr. Bellido y Segurolotengo): con usuarios de sistema serían tres o cuatro usuarios, y **crearlos en Meta es complicado**. Se pidió a WhatsApp-Modular qué otras vías hay (ver abajo).
+Octubre, parcial al 1/10 a media mañana: 1 mensaje de autenticación en `…2820` (0,0113 real, una prueba de OTP) y 22 de servicio gratis. Octubre completo se pide el 1/11.
 
-## Dos hallazgos de tarifas (de WhatsApp-Modular, a verificar)
+## Qué dice y qué no
 
-- **Categoría de plantilla: una palanca real de ahorro.** Una plantilla propia pedida como UTILITY fue **recategorizada por Meta a MARKETING**, que cuesta 6,5 veces más (0,0740 frente a 0,0113 USD por mensaje). Las plantillas de la biblioteca de Meta conservan UTILITY. Es la palanca «categoría correcta de plantilla» de `docs/02` §3. Para proponerla hace falta medir con `pricing_analytics` cuánto volumen cae en MARKETING; no se propone nada sin medir (invariante 8).
-- **Fuentes de la tarifa.** La franquicia de 1.000 mensajes de servicio gratis por línea y mes sale de **fuentes secundarias** (la página oficial de Meta no la detalla). Las tarifas de Bolivia (0,0113 / 0,0113 / 0,0740) vienen de Twilio con fecha 23/09: **verificar con la tarjeta de tarifas del WhatsApp Manager** antes de usarlas en una propuesta (invariante 7).
+- **El costo de Meta es hoy prácticamente cero: USD 0,06 en septiembre.** El volumen es de unos 600 mensajes al mes, casi todos de servicio. Con **1.000 mensajes de servicio gratis por línea y mes** (fuente secundaria; verificar), ninguna línea los alcanza. **No hay una palanca de ahorro de importancia en Meta con este volumen.** Lo único pagado es la autenticación (el OTP) y algún mensaje de utilidad.
+- **La palanca de la categoría de plantilla** (utilidad recategorizada a marketing, 6,5 veces más cara) existe, pero hoy afecta a un mensaje al mes: **no se propone nada.** Cobrará sentido si el volumen de NovuChat crece; queda anotada.
+- **Meta devuelve el costo real solo para las WABA de la empresa dueña de la app (`…2820`).** Para las otras cinco rechaza el costo (error #10) y deja pedir solo el volumen. Por eso cada cifra va rotulada «real» o «estimado» (volumen por tarifa de Bolivia, **por verificar con la tarjeta de tarifas del WhatsApp Manager**); un país sin tarifa verificada queda «sin tarifa» y no se inventa (Alemania y EE. UU. en este caso). **El cierre exacto de las otras cinco sigue siendo el CSV de Facturación de Meta**, que baja Andres una vez al mes.
+- **Un error evitado:** la primera prueba de WhatsApp-Modular salió con 0 puntos porque pidió dimensiones sin `metric_types`; con ambos devuelve datos. El script de FinOps (`scripts/meta/pricing_analytics.py`) ya pide los dos.
+- **`…8189` (huérfana, en dirhams, sin líneas):** sigue pendiente revisar su saldo y cerrarla.
+
+## Cómo se mide de aquí en adelante
+
+1. **Primer día hábil de cada mes:** pedir a la sesión de WhatsApp-Modular `npm run costos:meta --mes AAAA-MM` y recibir los agregados por mensaje.
+2. **Contraste:** el CSV de Facturación de Meta que baja Andres, para las cinco WABA sin costo real.
+3. **El script propio de FinOps** (`scripts/meta/pricing_analytics.py`) queda como respaldo: tendría la misma limitación (costo real solo en la WABA de la app) y exigiría un token propio, que se evita.
 
 ## Límites y riesgos
 
