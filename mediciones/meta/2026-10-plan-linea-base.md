@@ -26,7 +26,7 @@
 
 ## Línea base de septiembre 2026 (primera medición real)
 
-Fuente: comando de solo lectura `npm run costos:meta` de WhatsApp-Modular (PR segurolotengopy/WhatsAppModular#130, pendiente de fusión), corrido el 2026-10-01 con el token de usuario de AAB1 **re-emitido ese día** (cubre las 11 WABA, vence el 2026-11-30). **Ningún token sale de ese proyecto**; a FinOps llegan solo agregados por mensaje. Cifras en USD.
+Fuente: comando de solo lectura `npm run costos:meta` de WhatsApp-Modular (PR segurolotengopy/WhatsAppModular#130, **fusionado** el 2026-10-01, commit `2af2cec`), corrido el 2026-10-01 con el token de usuario de AAB1 **re-emitido ese día** (cubre las 11 WABA, vence el 2026-11-30). **Ningún token sale de ese proyecto**; a FinOps llegan solo agregados por mensaje. Cifras en USD.
 
 | WABA | Paga | Mensajes en septiembre | Costo | Tipo de cifra |
 |---|---|---|---|---|
@@ -51,7 +51,7 @@ Octubre, parcial al 1/10 a media mañana: 1 mensaje de autenticación en `…282
 
 ## Cómo se mide de aquí en adelante
 
-1. **Primer día hábil de cada mes:** pedir a la sesión de WhatsApp-Modular `npm run costos:meta --mes AAAA-MM` y recibir los agregados por mensaje.
+1. **Día 1 de cada mes a las 9:00:** la rutina «Cierre mensual de Meta», creada por Andres, corre el comando (solo con la app abierta), deja un informe en Descargas y, si esta sesión está abierta, manda el resumen por mensaje. Primer cierre: 2026-11-01, con octubre completo.
 2. **Contraste:** el CSV de Facturación de Meta que baja Andres, para las cinco WABA sin costo real.
 3. **El script propio de FinOps** (`scripts/meta/pricing_analytics.py`) queda como respaldo: tendría la misma limitación (costo real solo en la WABA de la app) y exigiría un token propio, que se evita.
 
