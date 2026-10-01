@@ -22,10 +22,10 @@ Los valores (ARN, IDs de cuenta de facturación, tokens) se cargan como secretos
 
 Ninguna está otorgada. Cada fila dice qué se necesita, qué cuesta consultarlo y qué se pierde si se demora. Las tarifas y comportamientos se consultaron el 2026-09-30 en las páginas oficiales citadas; lo no confirmado lleva «(verificar)».
 
-### 2.1 AWS — rol `finops-lectura` por OIDC
+### 2.1 AWS — rol `finops-lectura` (creado el 2026-10-01; política en `docs/politicas/aws-finops-lectura.json`)
 
 - **Permiso (solo lectura):** `ce:Get*`, `ce:Describe*`, `ce:List*`, `budgets:ViewBudget`, `budgets:DescribeBudgetActionsForAccount`, `cur:DescribeReportDefinitions`. Contrastar la lista contra la referencia de autorización de IAM para Cost Explorer antes de otorgar (verificar: la consulta automática de esa página no devolvió la tabla).
-- **Confianza:** proveedor OIDC de GitHub, limitado a este repositorio y a la rama `main`; sin claves estáticas (`docs/03` §1.6).
+- **Confianza (hoy):** la cuenta de AWS puede asumir el rol, y solo las identidades con permiso explícito de `sts:AssumeRole`; sin claves estáticas. **Siguiente paso:** federación OIDC de GitHub limitada a este repositorio y a la rama `main`, si algún día la recolección corre en CI (`docs/03` §1.6). Se creó con la sesión de la raíz, una sola vez y por autorización expresa de Andres.
 - **Costo de consultar:** USD 0,01 por solicitud a la API de Cost Explorer, sin nivel gratuito para la API (https://aws.amazon.com/aws-cost-management/aws-cost-explorer/pricing/, 2026-09-30). Una línea base mensual por servicio cuesta decenas de solicitudes, es decir, centavos; la recolección debe agrupar por día y servicio en pocas llamadas y **declarar cuántas hizo**.
 - **Se necesita en:** cada cuenta de AWS del inventario (SeguroLoTengoDemo y firma F2; verificar cuántas y cuáles).
 
