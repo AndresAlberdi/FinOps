@@ -32,6 +32,14 @@
 4. Guardar el token con `scripts/meta/guardar_token.sh` (Claude lo lanza en una pestaña de su terminal y Andres lo pega en el prompt oculto).
 5. Pasar la lista de IDs de WABA (por mensaje, no en archivos versionados) para `datos/meta/wabas.txt`.
 
+## Lo que respondió NovuChat (2026-10-01, solo lectura de su respuesta)
+
+- **El objeto `pricing` del webhook de estado NO se guarda:** NovuChat descarta los acuses de estado. La conciliación mensaje a mensaje no es posible con lo que se guarda hoy; **`pricing_analytics` es la fuente real.**
+- **Cuentas (WABA), sin cifras exactas:** una compartida con WhatsApp-Modular (la del Demo A, con las apps `NovuChat-Demo-A` y `Demo SeguroLo Tengo`), una propia `NovuChat` (chat interno y Demo B), **una de Bellido en el portafolio de su doctor** (el doctor aún no aceptó ser administrador; hay una app y una WABA huérfanas) y una de demo (Platinum). Los alias y el número exacto viven en un archivo local que ninguna sesión lee; los tiene la sesión de cartera o Andres.
+- **Meta no ofrece alerta de gasto para Cloud API** (verificado por Andres en pantalla el 30/09). Por eso `pricing_analytics` es el **único** control de gasto disponible y justifica la revisión mensual.
+- **Riesgo de cobertura:** la WABA de Bellido está en el portafolio de otra persona. Un usuario de sistema creado en el portafolio de Andres **no la verá** salvo que el doctor comparta el acceso. Se anota para decidirlo con el contrato de Bellido («quién paga Meta», pendiente de su cliente).
+- **Estimación por inquilino:** solo existe la tarifa de referencia (0,0113 USD por mensaje saliente de Bolivia desde el 01/10); la de cartera, con bolsas de prueba de 20 mensajes para Bellido y 100 para Platinum, no está escrita.
+
 ## Límites y riesgos
 
 - **Cuántas WABA y en qué portafolios:** desconocido; se pidió el inventario a WhatsApp-Modular y a NovuChat. Sin él no se puede decir si un solo token alcanza a todas.
