@@ -1,0 +1,6 @@
+{ "Version": "2012-10-17",
+  "Statement": [ { "Sid": "FinOpsSoloLecturaCostos", "Effect": "Allow",
+    "Action": [ "ce:Get*", "ce:Describe*", "ce:List*",
+                "budgets:ViewBudget", "budgets:DescribeBudgetActionsForAccount",
+                "cur:DescribeReportDefinitions" ],
+    "Resource": "*" } ] }
