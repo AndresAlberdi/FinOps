@@ -37,26 +37,26 @@
 - **El objeto `pricing` del webhook de estado NO se guarda:** NovuChat descarta los acuses de estado. La conciliación mensaje a mensaje no es posible con lo que se guarda hoy; **`pricing_analytics` es la fuente real.**
 - **Cuentas (WABA), sin cifras exactas:** una compartida con WhatsApp-Modular (la del Demo A, con las apps `NovuChat-Demo-A` y `Demo SeguroLo Tengo`), una propia `NovuChat` (chat interno y Demo B), **una de Bellido en el portafolio de su doctor** (el doctor aún no aceptó ser administrador; hay una app y una WABA huérfanas) y una de demo (Platinum). Los alias y el número exacto viven en un archivo local que ninguna sesión lee; los tiene la sesión de cartera o Andres.
 - **Meta no ofrece alerta de gasto para Cloud API** (verificado por Andres en pantalla el 30/09). Por eso `pricing_analytics` es el **único** control de gasto disponible y justifica la revisión mensual.
-- **Riesgo de cobertura:** la WABA de Bellido está en el portafolio de otra persona. Un usuario de sistema creado en el portafolio de Andres **no la verá** salvo que el doctor comparta el acceso. Se anota para decidirlo con el contrato de Bellido («quién paga Meta», pendiente de su cliente).
+- **Riesgo de cobertura:** la WABA de Bellido está en el portafolio del doctor (invitación de administrador pendiente). Un usuario de sistema creado en otro portafolio **no la verá**. Hoy la paga Andres; «quién paga Meta» a partir del piloto queda para el contrato de Bellido.
 - **Estimación por inquilino:** solo existe la tarifa de referencia (0,0113 USD por mensaje saliente de Bolivia desde el 01/10); la de cartera, con bolsas de prueba de 20 mensajes para Bellido y 100 para Platinum, no está escrita.
 
 ## Inventario de cuentas (WABA), de WhatsApp-Modular, 2026-10-01 (solo últimos 4 dígitos)
 
-13 WABA en 5 portafolios, medidas por Graph API con el token de AAB1 (solo lectura). **Lo que cuesta dinero a Andres** es lo de los portafolios cuya tarjeta es suya.
+13 WABA en 5 portafolios, medidas por Graph API con el token de AAB1 (solo lectura). **Hoy Andres paga el consumo de las WABA de Bellido y de Interseguros** (todavía no son de ellos), además de las suyas: todas con tráfico entran en la medición.
 
 | Portafolio | WABA | Qué es | Línea | ¿La mide FinOps? |
 |---|---|---|---|---|
 | AAB1 | …2820 | Propia; OTP de SeguroLoTengo (pilotos, temporal: pasará a Interseguros) | 1 | **Sí** |
-| AAB1 | …4125 «NovuChat» | **Del cliente** (portafolio de Silvana): chat interno | 1 (USD) | No con token de AAB1: necesita el acceso del dueño |
-| AAB1 | …1573 «Segurolotengo» | **De Interseguros** | 1 | No: el costo es del dueño, no de Andres |
+| AAB1 | …4125 «NovuChat» | **Del portafolio de Silvana** (chat interno); no consta quién la paga | 1 (USD) | Pendiente de saber quién paga; el token de AAB1 no la lee |
+| AAB1 | …1573 «Segurolotengo» | **De Interseguros, pero la paga Andres por ahora** (la de SeguroLoTengo en producción) | 1 | **Sí**, pero el token de AAB1 no la lee (error #100): hace falta otro acceso |
 | AAB1, NovuChat Producción, Dr. Bellido, Segurolotengo | …3881, …2898, …4919, …8154 | **De prueba**, bloqueadas por el código 141006 | 0 | No se usan |
 | NovuChat Producción (tarjeta de Andres) | …7545 «Clínica Platinum» | Cliente de NovuChat | 1 | **Sí** |
 | NovuChat Producción | …1048 «NovuChat» | Demostración y captación; hoy sin uso | 1 | **Sí** |
 | NovuChat Producción | …8189 «AndresBellido-Asistente» | **Huérfana**, sin líneas; su saldo es en dirhams (AED), la única que no está en dólares | 0 | Revisar saldo y cierre |
 | NovuChat Producción | …0348 | Sin líneas | 0 | No |
-| Dr. Andrés Bellido | …3951 | Cliente de NovuChat (pediatra) | 1 | Solo si el doctor comparte el acceso |
+| Dr. Andrés Bellido | …3951 | Cliente de NovuChat (pediatra); **la paga Andres hoy** | 1 | **Sí**; está en el portafolio del doctor (invitación de administrador pendiente) |
 
-**Alcance real de una primera lectura: 3 WABA con tráfico** (…2820, …7545, …1048), más …3951 si el doctor da acceso. Un usuario de sistema pertenece a **un** portafolio: harán falta **dos** (AAB1 y NovuChat Producción), cada uno con su token, y un tercero si el doctor comparte la cuenta de Bellido.
+**Alcance real: 5 WABA con tráfico que paga Andres** (…2820, …1573, …7545, …1048 y …3951), más …4125 si resulta que también la paga él. Están repartidas en **cuatro portafolios** (AAB1, NovuChat Producción, Dr. Bellido y Segurolotengo): con usuarios de sistema serían tres o cuatro usuarios, y **crearlos en Meta es complicado**. Se pidió a WhatsApp-Modular qué otras vías hay (ver abajo).
 
 ## Dos hallazgos de tarifas (de WhatsApp-Modular, a verificar)
 
