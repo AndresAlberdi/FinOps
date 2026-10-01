@@ -2,7 +2,7 @@
 
 | Versión | Fecha | Estado |
 |---|---|---|
-| 0.1 | 2026-10-01 | **Estimación** desde la API de Actions; el cierre exacto está en Facturación (ver «Qué falta») |
+| 0.2 | 2026-10-01 | Estimación de minutos + **verificación con las pantallas de Facturación que envió Andres el 2026-10-01** |
 
 ## Cuentas y repositorios
 
@@ -34,7 +34,27 @@ Método: duración de cada trabajo (`/actions/runs/{id}/jobs`), redondeada hacia
 - **Seguridad avanzada (GHAS):** los campos no aparecen en ningún repositorio privado, lo que indica que no está activada (verificar). Se cobra por usuario activo, por lo que conviene confirmarlo.
 - **Costo fijo:** la suscripción del plan Pro de `segurolotengopy` y el plan real de `AndresAlberdi` no se pueden leer: los endpoints de facturación de GitHub exigen el permiso `user`, que los tokens actuales no tienen. Tarifa del plan Pro: verificar en la página de precios de GitHub.
 
-## Qué falta (lo puede ver solo Andres, en dos pantallas)
+## Verificado por Andres en Facturación (capturas del 2026-10-01)
+
+| Dato | `segurolotengopy` | `AndresAlberdi` |
+|---|---|---|
+| Plan | **GitHub Pro, USD 4,00 al mes** | GitHub Free, USD 0; Copilot Free, USD 0 |
+| Uso medido bruto, octubre al 1/10 | USD 13,56 | USD 22,41 |
+| Descuentos por uso incluido y repositorios públicos | USD 12,64 (el resto lo cubre la cuota de Actions) | USD 22,41 (todo) |
+| **Facturable de Actions** | **USD 0** | **USD 0** |
+| Minutos de Actions incluidos usados en octubre (al 1/10) | **65 de 3.000** | — |
+| Almacenamiento de Actions | 0 GB de 2 GB | — |
+| **Presupuestos de Actions** | **USD 0 con «detener el uso» activado** | **USD 0 con «detener el uso» activado** |
+| Pagos pendientes | Ninguno | Ninguno |
+
+- **El costo fijo de GitHub es USD 4,00 al mes** (el plan Pro de `segurolotengopy`). Las cifras brutas (en septiembre el gráfico llegó a ~USD 138 en `segurolotengopy` y ~USD 60 en `AndresAlberdi`) **no son costo**: son uso medido que los descuentos cubren, sobre todo los repositorios públicos, que son gratis.
+- **El riesgo operativo quedó confirmado.** Ambas cuentas tienen el presupuesto de Actions en USD 0 con «detener el uso»: **al agotar los 3.000 minutos incluidos, los trabajos de los repositorios privados dejan de correr y el CI se bloquea.** En septiembre `segurolotengopy` usó ~2.958 minutos (estimado), a 1,4 % del tope; octubre arrancó con 65 minutos al 1/10, pero `SeguroLoTengoDemo` entrega ese día.
+- **Recomendación (decide Andres, es un ajuste de Facturación suyo):** subir el presupuesto de **Actions de `segurolotengopy`** de USD 0 a un tope pequeño, por ejemplo **USD 10** (unos 1.600 minutos extra a USD 0,006), manteniendo «detener el uso». El costo máximo queda acotado y se evita el bloqueo. `AndresAlberdi` usa el 9 % de su cuota: no hace falta.
+- **Pendiente de verificación:** los minutos exactos de septiembre. En Facturación → **Uso** → período «Último mes», filtro por producto «Actions», figura la cantidad de minutos; contrastarla con la estimación de ~2.958.
+
+## Qué falta (lo puede ver solo Andres)
+
+_(Los puntos 1 y 3 de abajo quedaron respondidos arriba; queda el cuadro de minutos de septiembre.)_
 
 En **cada cuenta**, Configuración → **Facturación y planes → Uso**: anotar (1) el plan, (2) los minutos de Actions usados en septiembre y su costo, (3) el **límite de gasto / presupuesto de Actions** (si es USD 0, subirlo a un tope pequeño evita que el CI se detenga). Con eso se cierra la estimación. Alternativa sin pantallas: un token con el permiso mínimo de facturación, que no se pide ahora.
 
