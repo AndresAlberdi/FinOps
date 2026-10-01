@@ -32,6 +32,37 @@
 4. Guardar el token con `scripts/meta/guardar_token.sh` (Claude lo lanza en una pestaña de su terminal y Andres lo pega en el prompt oculto).
 5. Pasar la lista de IDs de WABA (por mensaje, no en archivos versionados) para `datos/meta/wabas.txt`.
 
+## Lo que respondió NovuChat (2026-10-01, solo lectura de su respuesta)
+
+- **El objeto `pricing` del webhook de estado NO se guarda:** NovuChat descarta los acuses de estado. La conciliación mensaje a mensaje no es posible con lo que se guarda hoy; **`pricing_analytics` es la fuente real.**
+- **Cuentas (WABA), sin cifras exactas:** una compartida con WhatsApp-Modular (la del Demo A, con las apps `NovuChat-Demo-A` y `Demo SeguroLo Tengo`), una propia `NovuChat` (chat interno y Demo B), **una de Bellido en el portafolio de su doctor** (el doctor aún no aceptó ser administrador; hay una app y una WABA huérfanas) y una de demo (Platinum). Los alias y el número exacto viven en un archivo local que ninguna sesión lee; los tiene la sesión de cartera o Andres.
+- **Meta no ofrece alerta de gasto para Cloud API** (verificado por Andres en pantalla el 30/09). Por eso `pricing_analytics` es el **único** control de gasto disponible y justifica la revisión mensual.
+- **Riesgo de cobertura:** la WABA de Bellido está en el portafolio del doctor (invitación de administrador pendiente). Un usuario de sistema creado en otro portafolio **no la verá**. Hoy la paga Andres; «quién paga Meta» a partir del piloto queda para el contrato de Bellido.
+- **Estimación por inquilino:** solo existe la tarifa de referencia (0,0113 USD por mensaje saliente de Bolivia desde el 01/10); la de cartera, con bolsas de prueba de 20 mensajes para Bellido y 100 para Platinum, no está escrita.
+
+## Inventario de cuentas (WABA), de WhatsApp-Modular, 2026-10-01 (solo últimos 4 dígitos)
+
+13 WABA en 5 portafolios, medidas por Graph API con el token de AAB1 (solo lectura). **Hoy Andres paga el consumo de las WABA de Bellido y de Interseguros** (todavía no son de ellos), además de las suyas: todas con tráfico entran en la medición.
+
+| Portafolio | WABA | Qué es | Línea | ¿La mide FinOps? |
+|---|---|---|---|---|
+| AAB1 | …2820 | Propia; OTP de SeguroLoTengo (pilotos, temporal: pasará a Interseguros) | 1 | **Sí** |
+| AAB1 | …4125 «NovuChat» | **Del portafolio de Silvana** (chat interno); no consta quién la paga | 1 (USD) | Pendiente de saber quién paga; el token de AAB1 no la lee |
+| AAB1 | …1573 «Segurolotengo» | **De Interseguros, pero la paga Andres por ahora** (la de SeguroLoTengo en producción) | 1 | **Sí**, pero el token de AAB1 no la lee (error #100): hace falta otro acceso |
+| AAB1, NovuChat Producción, Dr. Bellido, Segurolotengo | …3881, …2898, …4919, …8154 | **De prueba**, bloqueadas por el código 141006 | 0 | No se usan |
+| NovuChat Producción (tarjeta de Andres) | …7545 «Clínica Platinum» | Cliente de NovuChat | 1 | **Sí** |
+| NovuChat Producción | …1048 «NovuChat» | Demostración y captación; hoy sin uso | 1 | **Sí** |
+| NovuChat Producción | …8189 «AndresBellido-Asistente» | **Huérfana**, sin líneas; su saldo es en dirhams (AED), la única que no está en dólares | 0 | Revisar saldo y cierre |
+| NovuChat Producción | …0348 | Sin líneas | 0 | No |
+| Dr. Andrés Bellido | …3951 | Cliente de NovuChat (pediatra); **la paga Andres hoy** | 1 | **Sí**; está en el portafolio del doctor (invitación de administrador pendiente) |
+
+**Alcance real: 5 WABA con tráfico que paga Andres** (…2820, …1573, …7545, …1048 y …3951), más …4125 si resulta que también la paga él. Están repartidas en **cuatro portafolios** (AAB1, NovuChat Producción, Dr. Bellido y Segurolotengo): con usuarios de sistema serían tres o cuatro usuarios, y **crearlos en Meta es complicado**. Se pidió a WhatsApp-Modular qué otras vías hay (ver abajo).
+
+## Dos hallazgos de tarifas (de WhatsApp-Modular, a verificar)
+
+- **Categoría de plantilla: una palanca real de ahorro.** Una plantilla propia pedida como UTILITY fue **recategorizada por Meta a MARKETING**, que cuesta 6,5 veces más (0,0740 frente a 0,0113 USD por mensaje). Las plantillas de la biblioteca de Meta conservan UTILITY. Es la palanca «categoría correcta de plantilla» de `docs/02` §3. Para proponerla hace falta medir con `pricing_analytics` cuánto volumen cae en MARKETING; no se propone nada sin medir (invariante 8).
+- **Fuentes de la tarifa.** La franquicia de 1.000 mensajes de servicio gratis por línea y mes sale de **fuentes secundarias** (la página oficial de Meta no la detalla). Las tarifas de Bolivia (0,0113 / 0,0113 / 0,0740) vienen de Twilio con fecha 23/09: **verificar con la tarjeta de tarifas del WhatsApp Manager** antes de usarlas en una propuesta (invariante 7).
+
 ## Límites y riesgos
 
 - **Cuántas WABA y en qué portafolios:** desconocido; se pidió el inventario a WhatsApp-Modular y a NovuChat. Sin él no se puede decir si un solo token alcanza a todas.
