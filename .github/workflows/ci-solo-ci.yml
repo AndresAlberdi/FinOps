@@ -1,6 +1,6 @@
 # =============================================================================
 # ci-solo-ci.yml — Repositorio sin despliegue: solo calidad y seguridad
-# Versión: 2.0 | Fecha: 2026-09-30
+# Versión: 2.4 | Fecha: 2026-10-01
 # -----------------------------------------------------------------------------
 # Para repositorios que no despliegan nada: documentación, scripts, registros,
 # herramientas de consulta. Llega hasta la compuerta (calidad + seguridad
@@ -21,16 +21,41 @@
 #   *.py ................ ruff (lint y formato)
 #   pruebas de Python ... pytest y cobertura mínima (COVERAGE_MIN)
 #   *.sh ................ ShellCheck (severidad warning)
+#   package.json ........ lint, typecheck, test y build del proyecto Node (abajo)
 #   .github/workflows ... actionlint (siempre hay: los del propio estándar)
 # Todo lo que está en `.github/` es copia del estándar —validar-manifiesto.py,
 # evaluar-zap.py— y ya lo comprueba el CI de SeguridadGeneral: se excluye de ruff
 # y de la detección de Python. Sin esa exclusión, `ruff format
 # --check` falla en todo repositorio nuevo porque esos scripts no siguen el
 # formato por defecto de ruff.
+#
+# Proyectos Node/TypeScript. Hay rama Node si `package.json` está versionado en la
+# RAÍZ del repositorio (el de una subcarpeta no cuenta). Alcance: npm y pnpm, con
+# el lockfile versionado (package-lock.json o pnpm-lock.yaml). Con otro gestor
+# (yarn.lock) o sin lockfile, `calidad` FALLA con un error explícito en el paso
+# «Instalar dependencias (Node)» (después de ruff, pytest, ShellCheck y actionlint, que sí
+# corren y informan): pasar en verde sin comprobar sería peor que no tener el job. Es un
+# cambio incompatible para un repositorio con un package.json de herramientas sin lockfile
+# (p. ej. solo para prettier): se arregla versionando el lockfile. Un monorepo con workspaces se
+# comprueba a través de los scripts del package.json de la raíz (por ejemplo,
+# `npm run lint --workspaces` o `pnpm -r lint` dentro de «lint»); no se recorren los
+# package.json de las subcarpetas. Las dependencias se instalan con
+# `--ignore-scripts` (política de cadena de suministro, 01-seguridad/08). Límite medido el
+# 2026-10-01: con ese flag NO corre ningún script de instalación, tampoco los de una
+# allowlist (`allowBuilds`/`onlyBuiltDependencies` no tienen efecto con --ignore-scripts).
+# Un proyecto que depende de compilar o generar algo en la instalación (módulos nativos)
+# no puede usar esta rama: conserva su propio job de calidad e integra solo
+# `seguridad-estatica` y `compuerta-pr`. Tampoco exige cobertura mínima (COVERAGE_MIN es de
+# Python). Después corren, en
+# orden, los scripts de NODE_SCRIPTS que package.json define; los que no define se
+# omiten y se dicen en el log. Si ninguno corrió, el job falla: un proyecto Node que
+# no ejecuta nada no está comprobado.
+#
 # La seguridad (gitleaks, Semgrep, Trivy fs, auditoría nativa, IaC si hay) la da
 # el reusable, con `stack: auto`.
 #
-# Variables (todas opcionales): PYTHON_VERSION (3.12), COVERAGE_MIN (70),
+# Variables (todas opcionales): PYTHON_VERSION (3.12), NODE_VERSION (22),
+#            NODE_SCRIPTS (lint typecheck test build), COVERAGE_MIN (70),
 #            BLOQUEAR_EN (CRITICAL,HIGH), GHAS_ENABLED
 # Secretos (opcionales, solo si el repositorio es de una organización o usa
 # Snyk): GITLEAKS_LICENSE, SNYK_TOKEN
@@ -47,11 +72,23 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  # Un PR cancela su corrida anterior (misma ref); cualquier otra corrida (push a main,
+  # tag, workflow_dispatch) tiene su grupo único y nunca se cancela. Es `github.run_id`
+  # y NO `github.sha`: con sha, el push de un tag vX.Y.Z y un workflow_dispatch sobre
+  # ese mismo commit compartirían grupo y la segunda corrida cancelaría la corrida
+  # ENTERA de la primera, incluido un despliegue a producción en curso (la concurrency
+  # propia del job, deploy-production, no lo evita: protege al job de otros jobs, no de
+  # que cancelen su corrida). Lo señaló la sesión de novuchat-site el 2026-10-01.
+  # La condición va en `group` y NO en
+  # `cancel-in-progress`: Checkov descarta en silencio, sin error ni aviso, todo
+  # workflow cuyo `cancel-in-progress` sea una expresión (medido el 2026-10-01 con
+  # checkov 3.3.13), y el job `iac` pasaba en verde sin analizarlo.
+  group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
 
 env:
   PYTHON_VERSION: ${{ vars.PYTHON_VERSION || '3.12' }}
+  NODE_VERSION: ${{ vars.NODE_VERSION || '22' }}
 
 jobs:
   # ---------------------------------------------------------------------------
@@ -63,6 +100,9 @@ jobs:
     timeout-minutes: 20
     env:
       COVERAGE_MIN: ${{ vars.COVERAGE_MIN || 70 }}
+      # Scripts de package.json que se ejecutan, en este orden. Solo letras, dígitos,
+      # «:», «_», «-» y espacios (se valida antes de usarla).
+      NODE_SCRIPTS: ${{ vars.NODE_SCRIPTS || 'lint typecheck test build' }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -97,18 +137,42 @@ jobs:
           elif [[ -f requirements.txt ]];     then gestor="pip"; instalar="pip install -r requirements.txt"
           else instalar=""; fi
 
+          # Node: solo cuenta el package.json de la raíz y solo si está versionado.
+          # `git ls-files -- package.json` es una ruta literal: no baja a subcarpetas.
+          # Sin lockfile de npm o pnpm no se instala nada y el paso «Instalar dependencias
+          # (Node)» FALLA (no aquí: así ruff y pytest corren y se informan antes). No se
+          # pasa en verde sin comprobar.
+          # --ignore-scripts: política de cadena de suministro (01-seguridad/08); no corre
+          # ni los scripts de una allowlist (ver la cabecera).
+          nodo="$(git ls-files -- package.json)"
+          lock_pnpm="$(git ls-files -- pnpm-lock.yaml)"
+          lock_npm="$(git ls-files -- package-lock.json)"
+          gestor_node=""
+          instalar_node=""
+          if [[ -n "$nodo" ]]; then
+            if   [[ -n "$lock_pnpm" ]]; then gestor_node="pnpm"; instalar_node="pnpm install --frozen-lockfile --ignore-scripts"
+            elif [[ -n "$lock_npm" ]];  then gestor_node="npm";  instalar_node="npm ci --ignore-scripts"
+            else
+              echo "package.json en la raíz sin lockfile de npm ni de pnpm versionado: «Instalar dependencias (Node)» fallará."
+            fi
+          fi
+
           contar() { if [[ -z "$1" ]]; then echo 0; else printf '%s\n' "$1" | wc -l; fi; }
           marca() { if [[ -n "$1" ]]; then echo true; else echo false; fi; }
           {
             echo "python=$(marca "$py")"
             echo "shell=$(marca "$sh")"
             echo "workflows=$(marca "$wf")"
+            echo "node=$(marca "$nodo")"
             echo "pruebas=$(marca "$pruebas")"
             echo "gestor=$gestor"
             echo "instalar=$instalar"
+            echo "gestor_node=$gestor_node"
+            echo "instalar_node=$instalar_node"
           } >> "$GITHUB_OUTPUT"
-          echo "Python: $(contar "$py") · shell: $(contar "$sh") · workflows: $(contar "$wf") · archivos de prueba: $(contar "$pruebas")"
+          echo "Python: $(contar "$py") · shell: $(contar "$sh") · workflows: $(contar "$wf") · archivos de prueba: $(contar "$pruebas") · Node: $(marca "$nodo") (${gestor_node:-ninguno})"
           echo "Instalación de dependencias: ${instalar:-ninguna}"
+          echo "Instalación de dependencias (Node): ${instalar_node:-ninguna}"
 
       - name: Python
         if: steps.detectar.outputs.python == 'true'
@@ -167,16 +231,97 @@ jobs:
           set -euo pipefail
           docker run --rm -v "$PWD:/repo:ro" -w /repo rhysd/actionlint:1.7.7@sha256:887a259a5a534f3c4f36cb02dca341673c6089431057242cdc931e9f133147e9
 
+      # Node. Con pnpm, corepack se habilita ANTES de setup-node: la action lo necesita
+      # para encontrar pnpm y calcular la caché (mismo orden que ci-node-firebase.yml).
+      - name: Habilitar corepack (pnpm)
+        if: steps.detectar.outputs.node == 'true' && steps.detectar.outputs.gestor_node == 'pnpm'
+        run: |
+          set -euo pipefail
+          corepack enable
+
+      - name: Node.js con caché
+        if: steps.detectar.outputs.node == 'true' && steps.detectar.outputs.gestor_node != ''
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: ${{ steps.detectar.outputs.gestor_node }}
+
+      # El comando llega por `env:` y no interpolado en el script, como en Python.
+      # Lleva --ignore-scripts (ver la cabecera); lo fija el paso Detectar. Sin comando
+      # (package.json sin lockfile admitido) el paso falla con el motivo.
+      - name: Instalar dependencias (Node)
+        if: steps.detectar.outputs.node == 'true'
+        env:
+          INSTALAR_NODE: ${{ steps.detectar.outputs.instalar_node }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$INSTALAR_NODE" ]]; then
+            echo "::error::package.json en la raíz sin lockfile versionado: solo se admiten npm (package-lock.json) y pnpm (pnpm-lock.yaml). Versione el lockfile; con yarn, migre a pnpm o a npm."
+            exit 1
+          fi
+          bash -c "$INSTALAR_NODE"
+
+      # Cada nombre de NODE_SCRIPTS se comprueba contra package.json: los que no
+      # define se omiten (no todo proyecto tiene typecheck o build), pero si ninguno
+      # corre el paso falla. La variable se valida antes de usarla: es un valor
+      # editable por quien administra el repositorio y acaba en una orden de shell.
+      # `node -e` distingue ausente (3) de package.json ilegible (1): este último
+      # falla el paso, no se confunde con «no define el script».
+      - name: Scripts de Node
+        if: steps.detectar.outputs.node == 'true'
+        env:
+          GESTOR_NODE: ${{ steps.detectar.outputs.gestor_node }}
+        run: |
+          set -euo pipefail
+          # Cada nombre empieza por letra, dígito o «_»: un «-» inicial (`--help`, `-v`) lo
+          # tomaría node o npm como opción propia y saldría con 0 sin comprobar nada.
+          patron='^ *[A-Za-z0-9_][A-Za-z0-9:_-]*( +[A-Za-z0-9_][A-Za-z0-9:_-]*)* *$'
+          if [[ ! "$NODE_SCRIPTS" =~ $patron ]]; then
+            echo "::error::NODE_SCRIPTS solo admite nombres de script separados por espacios (letras, dígitos, «:», «_» y «-», sin «-» al inicio); revise vars.NODE_SCRIPTS."
+            exit 1
+          fi
+          read -ra nombres <<< "$NODE_SCRIPTS"
+          corridos=0
+          omitidos=0
+          for s in "${nombres[@]}"; do
+            rc=0
+            node -e 'const s = require("./package.json").scripts || {}; process.exit(Object.prototype.hasOwnProperty.call(s, process.argv[1]) ? 0 : 3)' -- "$s" || rc=$?
+            if [[ "$rc" -eq 3 ]]; then
+              echo "omitido: package.json no define $s"
+              omitidos=$((omitidos + 1))
+              continue
+            elif [[ "$rc" -ne 0 ]]; then
+              echo "::error::No se pudo leer package.json (node terminó con código $rc)."
+              exit 1
+            fi
+            echo "::group::$GESTOR_NODE run $s"
+            if [[ "$GESTOR_NODE" == "pnpm" ]]; then pnpm run "$s"; else npm run "$s"; fi
+            echo "::endgroup::"
+            corridos=$((corridos + 1))
+          done
+          echo "Scripts de Node: $corridos ejecutados, $omitidos omitidos"
+          if [[ "$corridos" -eq 0 ]]; then
+            echo "::error::Ningún script de NODE_SCRIPTS ($NODE_SCRIPTS) está definido en package.json: un proyecto Node que no ejecuta nada no está comprobado. Defina scripts (lint, typecheck, test, build) o fije vars.NODE_SCRIPTS con los que existan."
+            exit 1
+          fi
+
       - name: Resumen
         env:
           PYTHON: ${{ steps.detectar.outputs.python }}
           PRUEBAS: ${{ steps.detectar.outputs.pruebas }}
           SHELL_SH: ${{ steps.detectar.outputs.shell }}
           WORKFLOWS: ${{ steps.detectar.outputs.workflows }}
+          NODE: ${{ steps.detectar.outputs.node }}
+          GESTOR_NODE: ${{ steps.detectar.outputs.gestor_node }}
         run: |
           {
             echo "### calidad (solo-ci)"
             echo "- ruff: $PYTHON · pytest: $PRUEBAS · shellcheck: $SHELL_SH · actionlint: $WORKFLOWS"
+            if [[ "$NODE" == "true" ]]; then
+              echo "- node: $NODE (${GESTOR_NODE:-ninguno}) · scripts: ${NODE_SCRIPTS}"
+            else
+              echo "- node: false"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
   # ---------------------------------------------------------------------------
@@ -187,7 +332,11 @@ jobs:
     permissions:
       contents: read
       # security-events: write solo lo usa el reusable cuando subir_sarif = true.
-      # Sin pull-requests: write: los escáneres no comentan en el PR.
+      # Sin pull-requests: write (los escáneres no comentan en el PR).
+      # pull-requests: read lo pide el job `secretos` del reusable: gitleaks-action lista
+      # los commits del PR por la API y, en un repositorio privado, sin él responde 403.
+      # Un job llamador no puede conceder menos de lo que el reusable pide.
+      pull-requests: read
       security-events: write
       actions: read
     uses: ./.github/workflows/_reusable-security.yml
