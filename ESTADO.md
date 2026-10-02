@@ -1,6 +1,6 @@
 # ESTADO — FinOps-Ecosistema
 
-**Última actualización:** 2026-09-30
+**Última actualización:** 2026-10-02
 
 ## Punto de retorno (leer primero al abrir una sesión)
 
@@ -20,6 +20,7 @@
 8. ~~Rutas de los agentes~~ **hecho:** todas absolutas, hacia `/home/andres-alberdi/SeguridadGeneral` (decisión de Andres, 2026-09-30; nunca `~`).
 9. Borrar o conservar `AndresAlberdi/FinOpsEcosistema` (vacío): decisión de Andres.
 10. Bloques 1 (políticas por otorgar), 3 y 4: tras tener línea base.
+11. **Control de costos por negocio (requisito de Andres, 2026-10-02):** PRETSO, Hipatia, NovuChat y SeguroLoTengo llevan su propio control. Plan en `docs/06-costos-por-negocio.md` (un FinOps central con vista por negocio; costo directo «medido» y compartido «asignado»). **Hallazgo:** PRETSO (cuenta de facturación …5B3F) e Hipatia (…44F7) facturan por cuentas que no se exportan hoy ni lista la identidad de lectura; falta saber a qué cuenta de Google pertenecen y activar su export. Mapa pedido a las cuatro sesiones el 2026-10-02; esperar respuestas y la decisión de Andres sobre «Por asignar» y sobre las reglas de asignación.
 
 ### Coordinación 2026-09-29 (formato de la orden general)
 - Fase 0: hecha — `main` en `AndresAlberdi/FinOps`.
