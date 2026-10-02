@@ -2,7 +2,8 @@
 
 | Versión | Fecha | Estado |
 |---|---|---|
-| 0.1 | 2026-10-02 | Plan aprobado por Andres el 2026-10-02; el mapa de la §3 es preliminar y lo completan las sesiones de cada negocio |
+| 0.1 | 2026-10-02 | Plan aprobado por Andres el 2026-10-02 |
+| 0.2 | 2026-10-02 | Mapa de la §3 completado con las respuestas de las cuatro sesiones; falta la decisión de Andres sobre lo «por asignar» |
 
 ## 1. Requisito y decisión de diseño
 
@@ -16,19 +17,24 @@ PRETSO, Hipatia, NovuChat y SeguroLoTengo son **negocios independientes**: cada 
 - **Asignado (por regla):** el costo es compartido (plan de Claude, GitHub Pro, la VM de OCI con n8n). Se reparte con una regla escrita y se rotula «asignado». No cuenta como ahorro medido (invariante 8).
 - **Sin dueño:** lo que ningún negocio reclama queda en «Otros» hasta que Andres decida. Nunca se reparte en silencio.
 
-## 3. Mapa proyecto/servicio → negocio (preliminar)
+## 3. Mapa proyecto/servicio → negocio (v0.2)
 
-Fuente: lectura en solo lectura de los proyectos de Google y de su facturación (2026-10-02). Las cuentas de facturación se citan por sus últimos 4 caracteres. «(verificar)» = lo confirma la sesión del negocio.
+Fuentes: lectura en solo lectura de los proyectos de Google y su facturación (2026-10-02) y las respuestas de las sesiones de PRETSO, Hipatia, SeguroLoTengo y NovuChat del mismo día. Cuentas de facturación por sus últimos 4 caracteres. «(verificar)» = sin confirmar.
 
-| Negocio | Google Cloud (proyecto → cuenta de facturación) | Otros servicios conocidos |
+| Negocio | Google Cloud (proyecto → cuenta de facturación) | AWS, Meta, GitHub y otros |
 |---|---|---|
-| NovuChat | `novuchat-demo`, `novuchat-site`, `novuchatstaging` → …3EC8 (con facturación); `novuchat-admin-dev` y `novuchat-admin-prod` sin facturación; `novuchatdemo` (Gemini) en la cuenta C | Meta: WABA de clientes que paga Andres (verificar cuáles); n8n en la VM de OCI |
-| PRETSO | `pretso-prod`, `pretso-database` → …5B3F | Dominios (verificar) |
-| Hipatia | `hipatia-landing-page`, `hipatia-puntos` → …44F7 | Verificar |
-| SeguroLoTengo | Verificar (la demo corre en AWS) | AWS: cuenta de la demo (terminada en 8663); GitHub Pro de `segurolotengopy` (compartido, §4) |
-| Por asignar (Andres decide) | `whatsappmodular` y `puntosnb` → …3EC8; `aab1-*`; `encuentramebo-1`; `manejoqrsimple`; `kepler-bolivia`; `snack-laestacion`; `facturadorsiat`; `silsaki-web`; `rag-generico*`; demás | WhatsApp-Modular y AAB1 (socio); ManejoQRSimple; Firmas-NoCualificadas; ChatBotRAG |
+| **NovuChat** | `novuchat-demo` (consola), `novuchat-site`, `novuchatstaging` → …3EC8. `novuchat-admin-dev` y `novuchat-admin-prod`: sin facturación (su dueño, verificar). `novuchatdemo` (Gemini de producción) en la cuenta C. `novuchat-pruebas` (Gemini de pruebas; gastó las baterías del 30/09 y el 01/10): **no figura en ninguna exportación; verificar** si es el proyecto autogenerado de la cuenta C | Meta: WABA de Bellido (…3951; la tarjeta está cargada en esa WABA) y de NovuChat (…1048). GitHub: `NovuChat` y `novuchat-site` (públicos); `ManejoQRSimple` y `OnboardingGenerico` (verificar). Dominio `novuchat.site`. n8n: flujos por cliente |
+| **PRETSO** | `pretso-prod` y `pretso-database` → …5B3F | Sin Meta, n8n, dominios ni Claude API. Repo público `PRETSO` (Actions gratis) |
+| **Hipatia** | `hipatia-puntos` (producción) y `hipatia-landing-page` (dueño de la landing: verificar) → …44F7. `puntosnb` (pruebas y pilotos; «PuntosNB» es el nombre histórico del repo) → …3EC8 | Dominio `hipatiabo.com` (costo anual desconocido). Repo público `PuntosNB`. Meta: solo planeado |
+| **SeguroLoTengo** | Ninguno | AWS: cuenta …8663 (demo, Amplify, DynamoDB, S3, SES, Textract/Rekognition; Transfer Family y VPN apagados). GitHub: `SeguroLoTengoDemo` (privado) y el plan Pro de `segurolotengopy`. Lovable y Snyk: costo desconocido |
+| **Por asignar (decide Andres)** | `whatsappmodular` → …3EC8 (de WhatsApp-Modular); `aab1-*`; `encuentramebo-1` (y la cuenta C con `encuentramebo`); `manejoqrsimple`; `kepler-bolivia`; `snack-laestacion`; `facturadorsiat`; `silsaki-web`; `rag-generico*`; `demoa`/`demob`; otros | WhatsApp-Modular (Meta: AAB1 y WABA compartida con el Demo A), VM de OCI con n8n (comparten NovuChat y WhatsApp-Modular), WABA de Silvana (…4125, «paga Silvana»), WABA de prueba (…8154), Interseguros (dueño no identificado), `ChatbotRAG`, `RAG-Generico`, `FirmadorMasivoCualificado`, `cps-plataforma`, `encuentrame.bo`, `ProyectosGeneral` |
 
-**Hallazgo:** PRETSO (…5B3F) e Hipatia (…44F7) facturan por cuentas de facturación que **no son las dos que se exportan hoy** (…3EC8 y la de la cuenta C) y que **la identidad de lectura de este proyecto no lista**. Hoy no hay medición de su costo. Hay que averiguar con Andres a qué cuenta de Google pertenecen y activar su export de facturación a BigQuery, como en `docs/04` (lo activa Andres desde la consola; solo lo puede hacer quien administre esa cuenta de facturación).
+**Hallazgos:**
+1. **PRETSO (…5B3F) e Hipatia producción (…44F7) facturan por cuentas que no se exportan hoy** ni lista la identidad de lectura de este proyecto; las propias sesiones tampoco pueden leerlas. Hoy no hay medición de su costo. Hay que averiguar a qué cuenta de Google pertenecen y activar su export a BigQuery (`docs/04`; lo hace Andres desde la consola).
+2. **NovuChat e Hipatia (`puntosnb`) comparten la cuenta de facturación …3EC8**, junto con presupuestos mezclados de ambos. La separación se hace por proyecto de Google, no por cuenta; la separación de presupuestos se propone aparte.
+3. **El costo de PRETSO en la nube hoy es de centavos**; el riesgo es de visibilidad: `pretso-database`, el sitio en uso, no tiene presupuesto verificado.
+4. **El riesgo de SeguroLoTengo** es Transfer Family y la VPN con Alianza si se encienden (se cobran por hora), y el paso a producción; el presupuesto de USD 50 al mes está muy por encima del gasto real de septiembre y no distingue esos servicios.
+5. **La VM de OCI la comparten NovuChat y WhatsApp-Modular**, no un solo negocio: la regla de la §4 reparte la cuota gratuita, no dinero.
 
 ## 4. Reglas de asignación de lo compartido
 
@@ -50,7 +56,7 @@ Fuente: lectura en solo lectura de los proyectos de Google y de su facturación 
 
 | Fase | Contenido | Quién | Cuándo |
 |---|---|---|---|
-| 1 | Completar y aprobar el mapa; identificar la cuenta de facturación de PRETSO e Hipatia | Sesiones de los cuatro negocios + Andres | Esta semana |
+| 1 | Mapa completado por las cuatro sesiones (hecho el 2026-10-02); falta la decisión de Andres sobre lo «por asignar» y la cuenta de facturación de PRETSO e Hipatia | Andres | Esta semana |
 | 2 | Cortar por negocio las líneas base ya medidas (Google, Meta, GitHub, AWS, OCI), sin accesos nuevos | FinOps | Tras el mapa |
 | 3 | Aprobar las reglas de la §4 | Andres | Con la fase 2 |
 | 4 | Export de facturación de PRETSO e Hipatia | Andres (consola) y FinOps | Cuando conste la cuenta |
@@ -66,5 +72,6 @@ Fuente: lectura en solo lectura de los proyectos de Google y de su facturación 
 ## 8. Pendiente de decisión de Andres
 
 1. Aprobar las reglas de asignación de la §4.
-2. Decidir el destino de «Por asignar» (WhatsApp-Modular, AAB1, PuntosNB y los demás).
-3. Indicar a qué cuenta de Google pertenecen las cuentas de facturación de PRETSO e Hipatia.
+2. Decidir el destino de «Por asignar»: ¿WhatsApp-Modular y AAB1 son negocios propios? ¿Interseguros pertenece a SeguroLoTengo? ¿Qué hacer con encuentrame.bo, ManejoQRSimple y los demás?
+3. Indicar a qué cuenta de Google pertenecen las cuentas de facturación de PRETSO e Hipatia (…5B3F y …44F7) y quién lleva `hipatia-landing-page`.
+4. Decir si paga Lovable y Snyk, y el costo anual del dominio `hipatiabo.com`.
