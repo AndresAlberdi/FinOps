@@ -28,6 +28,7 @@
 | 2026-09-30 18:57 | 14 % | **4 %** | 0 % | desactivado (tope USD 40) | Plan: **Max**. Renueva 2026-10-02 08:00 UTC. La ventana semanal se reinició con los créditos; condición de Andres: consumir el equivalente a 1 semana en 40 h |
 | 2026-10-10 12:51 | 10 % | **40 %** | 9 % | desactivado (tope USD 40) | Plan: Max. Semana iniciada el 9/10 08:00 UTC (renueva el 16/10 08:00). 3 sesiones en marcha; 53 abiertas sin archivar (`2026-10-inventario-de-sesiones.md`) |
 | 2026-10-10 17:17 | 4 % | **47 %** | 9 % | desactivado (tope USD 40) | +7 puntos en 4,4 h. Ritmo semanal ≈ 1,4 puntos/h: **a este ritmo la cuota se agota hacia el 12/10, unos 4 días antes de renovar** (extrapolación, no medición). Andres reportó ~50 % en dos días en la semana del 8/10 |
+| 2026-10-11 06:11 | 15 % | **57 %** | 10 % | desactivado (tope USD 40) | Plan: Max. Primera línea de la rutina `finops-serie-cuota-diaria` (`datos/claude/serie-cuota.tsv`). 46 h de semana transcurridas; renueva el 16/10 08:00 UTC. 50 sesiones listadas, 2 en marcha |
 
 ## 4. Límites de esta línea base
 
