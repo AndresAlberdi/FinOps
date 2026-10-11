@@ -37,7 +37,7 @@ def minutos_trabajo(inicio: str, fin: str) -> int:
 
 
 def _t(texto: str) -> datetime:
-    return datetime.fromisoformat(texto.replace("Z", "+00:00"))
+    return datetime.fromisoformat(texto)  # Python 3.11+ acepta el sufijo «Z»
 
 
 def resumir(trabajos: list[tuple], eventos: dict[str, str]) -> dict:
