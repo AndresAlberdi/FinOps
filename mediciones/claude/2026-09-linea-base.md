@@ -26,6 +26,8 @@
 |---|---|---|---|---|---|
 | 2026-09-29 13:44 | 12 % | **84 %** | 73 % | desactivado (tope USD 40) | Plan: Pro. Faltan 2 d 18 h para renovar; 6 sesiones prioritarias activas en paralelo |
 | 2026-09-30 18:57 | 14 % | **4 %** | 0 % | desactivado (tope USD 40) | Plan: **Max**. Renueva 2026-10-02 08:00 UTC. La ventana semanal se reinició con los créditos; condición de Andres: consumir el equivalente a 1 semana en 40 h |
+| 2026-10-10 12:51 | 10 % | **40 %** | 9 % | desactivado (tope USD 40) | Plan: Max. Semana iniciada el 9/10 08:00 UTC (renueva el 16/10 08:00). 3 sesiones en marcha; 53 abiertas sin archivar (`2026-10-inventario-de-sesiones.md`) |
+| 2026-10-10 17:17 | 4 % | **47 %** | 9 % | desactivado (tope USD 40) | +7 puntos en 4,4 h. Ritmo semanal ≈ 1,4 puntos/h: **a este ritmo la cuota se agota hacia el 12/10, unos 4 días antes de renovar** (extrapolación, no medición). Andres reportó ~50 % en dos días en la semana del 8/10 |
 
 ## 4. Límites de esta línea base
 
@@ -54,3 +56,7 @@ Fuente: `get_session` (metadatos; no lee conversaciones). **El campo `model` es 
 ## 6. Ventana de 40 horas (desde 2026-09-30)
 
 Andres consiguió créditos con la condición de consumir el equivalente a una semana en 40 horas. La comparación semanal del §2 pierde sentido mientras dure: la unidad pasa a ser la **ventana de 40 h**. Se anota el `% semanal` al inicio y al fin, las horas reales y los PR fusionados en ese lapso. Inicio de la ventana: 2026-09-30 ~19:00 UTC (4 % usado). Fin: a las 40 h de trabajo efectivo o al agotarse el crédito, lo que ocurra antes (la fecha exacta la confirma Andres; verificar en las condiciones de Claude).
+
+## 7. Inventario de sesiones (2026-10-10)
+
+Ver `mediciones/claude/2026-10-inventario-de-sesiones.md`: 53 sesiones sin archivar, 39 «cerrar ya» (24 son ejecuciones de rutinas o sesiones vacías), 12 «cerrar con relevo», 2 «conservar». Las rutinas no heredan Sonnet: Hipatia corre en Opus cada 12 h desde el 2/10 (17 ejecuciones), la rutina del 6/10 de FinOps corrió en Fable. **Nota de método:** la comparación 84 % (29/09, plan Pro) frente a 47 % (10/10, plan Max) no es homogénea: el plan cambió entre ambas lecturas.
