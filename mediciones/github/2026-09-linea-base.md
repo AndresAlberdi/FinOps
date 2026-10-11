@@ -63,3 +63,13 @@ Unas 3.500 solicitudes a la API de GitHub, sin costo; dentro del límite de tasa
 
 ## Siguiente paso
 Repetir el primer día hábil de cada mes con `python3 scripts/github/minutos_actions.py --mes AAAA-MM --cuota 3000` (Pro) o `2000` (Free), y marcar anomalía si un mes supera en más de 20 % la media de los tres anteriores.
+
+## Lectura del 2026-10-04 (pantalla de Facturación → Uso de `segurolotengopy`)
+
+| Mes | Bruto | Facturado | Minutos de Actions |
+|---|---|---|---|
+| Agosto | USD 17,70 | USD 0 | — |
+| Septiembre | USD 138,93 | USD 0 | — |
+| Octubre (1 al 4) | USD 62,89 | USD 0 | 10.478 (Linux) |
+
+El bruto incluye los repositorios públicos (gratuitos) y por eso es mucho mayor que los 2.958 minutos estimados para los privados; lo **facturado** es cero. No se pudo separar cuántos minutos son de repositorios privados (haría falta el informe «Get usage report», por repositorio). **El presupuesto de Actions de `segurolotengopy` se subió de USD 0 a USD 10 el 2026-10-02** por orden de Andres (con «detener el uso» y alertas activas): la recomendación de arriba quedó cumplida.
