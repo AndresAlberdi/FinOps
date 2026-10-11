@@ -1,6 +1,6 @@
 # ESTADO — FinOps-Ecosistema
 
-**Última actualización:** 2026-10-04
+**Última actualización:** 2026-10-10
 
 ## Punto de retorno (leer primero al abrir una sesión)
 
@@ -20,6 +20,7 @@
 8. ~~Rutas de los agentes~~ **hecho:** todas absolutas, hacia `/home/andres-alberdi/SeguridadGeneral` (decisión de Andres, 2026-09-30; nunca `~`).
 9. Borrar o conservar `AndresAlberdi/FinOpsEcosistema` (vacío): decisión de Andres.
 10. Bloques 1 (políticas por otorgar), 3 y 4: tras tener línea base.
+12. **Cuota de Claude (auditoría externa del 2026-10-10; Andres pidió ejecutar tras terminar «SeguroLoTengo Sesion Principal»).** Hecho: lectura del 10/10 (Max, 47 % semanal, ritmo que agotaría la cuota hacia el 12/10) e inventario de sesiones (`mediciones/claude/2026-10-inventario-de-sesiones.md`: 53 sin archivar; 39 «cerrar ya», 12 relevo, 2 conservar). Hallazgo: **17 ejecuciones de la rutina `app-check-hipatia`, todas en Opus, cada 12 h desde el 2/10; las rutinas no heredan Sonnet.** Pendiente por orden: (a) Andres confirma el orden de cierre; (b) bloque de relevo para las sesiones dueñas (con veredicto del guardián); (c) bloque 0 de estabilidad (`earlyoom` necesita `sudo` de Andres); (d) rutina diaria de lectura de cuota; (e) propuesta de norma a SeguridadGeneral; (f) `devsecops` y `proyectos` en Sonnet, solo en este repositorio, decide Andres; (g) el MCP a Antigravity **no se construye aquí**: bloque para un proyecto nuevo. El bloque de propuesta `propuestas/transversal/2026-10-cuota-estabilidad-y-delegacion.md` y el informe de auditoría siguen sin commit (los dejó la sesión de auditoría). Abiertos de antes: AWS septiembre real USD 5,30 (la línea base de `main` dice 4,96) y OCI/Meta sin verificar.
 11. **Control de costos por negocio (requisito de Andres, 2026-10-02):** PRETSO, Hipatia, NovuChat y SeguroLoTengo llevan su propio control. Plan en `docs/06-costos-por-negocio.md` (un FinOps central con vista por negocio; costo directo «medido» y compartido «asignado»). **Hallazgo:** PRETSO (cuenta de facturación …5B3F) e Hipatia (…44F7) facturan por cuentas que no se exportan hoy ni lista la identidad de lectura; falta saber a qué cuenta de Google pertenecen y activar su export. Mapa v0.3 (2026-10-02): lo «por asignar» resuelto con los valores por defecto de Andres (quinto negocio «AAB1 / WhatsApp-Modular», Encuéntrame.BO y ManejoQRSimple propios, categoría «Comunes»); de 28 proyectos de Google solo 9 facturan. Falta: reglas de asignación (§4), la cuenta de Google de …5B3F y …44F7, dueño de `OnboardingGenerico` y de la WABA …1573, costo de Lovable, Snyk y del dominio `hipatiabo.com`. Estado de septiembre por negocio **cerrado en Google** (`mediciones/negocios/2026-09-estado-por-negocio.md` v0.2): total medido USD 40,31 bruto y **29,91 neto** de créditos; NovuChat unos 24,92 neto (corrige la v0.1, que decía 2,82 por el export incompleto); SeguroLoTengo 4,99; el resto, cero. El «fijo ≈ USD 22» de NovuChat queda explicado (instancia mínima ≈ 16/mes). Falta PRETSO e Hipatia producción (cuentas no exportadas).
 
 ### Coordinación 2026-09-29 (formato de la orden general)
