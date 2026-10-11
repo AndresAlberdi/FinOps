@@ -3,6 +3,7 @@
 | Versión | Fecha | Estado |
 |---|---|---|
 | 0.1 | 2026-10-02 | Provisional: Google incompleto. **Su cifra de NovuChat (USD 2,82 neto) era errónea por el export incompleto** |
+| 0.3 | 2026-10-11 | **AWS corregido:** septiembre es 5,30 y no 4,96. SeguroLoTengo pasa de 4,99 a 5,33; total medido 40,65 bruto y 30,25 neto |
 | 0.2 | 2026-10-04 | **Septiembre cerrado en Google** (export completo hasta el 30/09). NovuChat pasa de unos USD 2,82 a **unos USD 24,92 neto**. Sigue sin medición PRETSO e Hipatia producción |
 
 Cifras en USD, agregadas; cuentas por sus últimos 4 caracteres; datos crudos en `datos/` (no versionado). «**Medido**» = lo informa el proveedor por proyecto, cuenta, WABA o repositorio. «**Asignado**» = reparto de un costo compartido con una regla de `docs/06` §4, **todavía por aprobar**; no cuenta como medido.
@@ -25,14 +26,14 @@ Cifras en USD, agregadas; cuentas por sus últimos 4 caracteres; datos crudos en
 | Negocio | Directo medido (bruto) | Créditos de Google | Directo neto | Asignado (regla por aprobar) | Cobertura |
 |---|---|---|---|---|---|
 | NovuChat | **35,10** (Google 35,09; Meta 0,01 estimado) | −10,19 | **24,92** | — | Google completo |
-| SeguroLoTengo | **4,99** (AWS 4,96; Meta OTP 0,03) | — | **4,99** | GitHub Pro 2,00 | Completa |
+| SeguroLoTengo | **5,33** (AWS 5,30; Meta OTP 0,03) | — | **5,33** | GitHub Pro 2,00 | Completa |
 | AAB1 / WhatsApp-Modular | **0,17** (Google) | −0,17 | **0,00** | GitHub Pro 2,00 | Google completo |
 | Hipatia | **0,04** (solo `puntosnb`) | −0,04 | **0,00** | — | **Producción sin medir** |
 | PRETSO | **sin medición** (cuenta …5B3F no exportada) | — | — | — | Sin dato |
 | Encuéntrame.BO | **0,00** (0,0033 bruto) | −0,00 | **0,00** | — | Google completo |
 | ManejoQRSimple | **0,00** (sin facturación) | — | **0,00** | — | Integración con Banco Económico sin medir |
 | Comunes | **0,00** (cargo «Invoice» 0,0025; Actions dentro de la cuota; OCI 0) | — | **0,00** | — | Completa, salvo Claude |
-| **Total medido** | **40,31** | **−10,40** | **29,91** | 4,00 | |
+| **Total medido** | **40,65** | **−10,40** | **30,25** | 4,00 | |
 
 **El gasto neto de septiembre es de unos USD 30, y 24,91 son Gemini** (cuenta C, NovuChat): 21,74 en dos días (29 y 30/09: baterías de pruebas y concurso de Bellido, con credencial de producción y modelos no-lite) y 3,17 en el resto del mes. Los créditos de Google solo existen en la cuenta principal (cubren todo su bruto de 10,40). Si esos créditos vencen o tienen tope, el costo de esa cuenta pasa del neto al bruto (unos 10 a 18 USD al mes).
 
@@ -57,7 +58,7 @@ Cifras en USD, agregadas; cuentas por sus últimos 4 caracteres; datos crudos en
 ### SeguroLoTengo
 | Proveedor | Concepto | USD | Tipo |
 |---|---|---|---|
-| AWS (…8663) | Amplify 4,17; Secrets Manager 0,57; Rekognition 0,16; DynamoDB 0,03; Transfer Family 0,03 | 4,96 | Medido |
+| AWS (…8663) | Amplify 4,49; Secrets Manager 0,59; Rekognition 0,16; DynamoDB 0,03; Transfer Family 0,03 | 5,30 | Medido |
 | Meta | OTP: 3 mensajes de autenticación de la WABA …2820 (cargo entre unidades, `docs/06` §3 hallazgo 7) | 0,03 | Medido (real) |
 | Meta | WABA de Interseguros (…1573): 1 mensaje de servicio, gratis (dueño por confirmar) | 0,00 | Medido |
 | GitHub | `SeguroLoTengoDemo`: 1.866 minutos de Actions (62 % de la cuota de 3.000 de la cuenta); dentro de la cuota | 0,00 | Estimado |
