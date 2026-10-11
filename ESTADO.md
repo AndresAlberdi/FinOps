@@ -1,12 +1,33 @@
 # ESTADO — FinOps-Ecosistema
 
-**Última actualización:** 2026-10-11
+**Última actualización:** 2026-10-11 (relevo de sesión)
 
 ## Punto de retorno (leer primero al abrir una sesión)
 
 **Contexto:** Andres consiguió créditos de Claude con la condición de consumir el equivalente a una semana en 40 horas (ventana iniciada ~2026-09-30 19:00 UTC; plan Max, cuota semanal en 4 % al iniciar; ver `mediciones/claude/2026-09-linea-base.md` §3 y §6). **Prioridad:** NovuChat, SeguroLoTengo, SeguridadGeneral, WhatsApp-Modular, Claude-Proyectos y PRETSO. Esta sesión corre en Sonnet 5.5.
 
 **Repositorio:** `AndresAlberdi/FinOps` (GEN, público). `main` protegido por el ruleset 24272555: sin borrado ni force-push, historial lineal, PR con 1 aprobación y revisión de propietario, `compuerta-pr` obligatorio y al día, **solo squash**. Toda escritura en `main` pasa por PR; la aprobación la da `segurolotengopy` con el OK de Andres en el chat. Estándar DevSecOps v2 con el stack `solo-ci` (PR #1 fusionado, `2313d55`); desvíos en `docs/05`.
+
+### Retomar aquí (relevo de sesión, 2026-10-11)
+
+La sesión «Finops y Optimización Sesion Principal» (creada el 29/09; contexto de más de 520.000 tokens) se releva por pedido de Andres para bajar el consumo de cuota. La sesión nueva lee solo `CLAUDE.md` y este archivo; la memoria del proyecto (`MEMORY.md`) se carga sola.
+
+**Qué se estaba haciendo:** ejecutar el plan de la auditoría de cuota del 10/10 (`propuestas/transversal/2026-10-cuota-estabilidad-y-delegacion.md`, de la sesión de auditoría) en el orden que aprobó Andres: (0) estabilidad, (1) medición, (2) ciclo de vida de sesiones, (3) agentes en Sonnet, (4) el MCP a Antigravity **no se construye aquí**.
+- **Hecho:** `earlyoom` activo (lo instaló Andres); `scripts/local/con-limite.sh` (PR #26); rutina diaria `finops-serie-cuota-diaria` (22:00 local; escribe `datos/claude/serie-cuota.tsv`); inventario de sesiones (PR #23); tres bloques escritos y revisados por el guardián (PR #27). **La rutina diaria corrió en Sonnet 5.5 aunque Andres la fijó en Haiku: comprobar con la corrida de las 22:00 (`get_session` del run).**
+- **Cuota (plan Max):** semanal 40 % → 47 % → 57 % → 68 % entre el 10/10 12:51 UTC y el 11/10 16:45 UTC; a ese ritmo se agotaría hacia el 12/10 (extrapolación, no medición). Semana del 9/10 08:00 UTC al 16/10 08:00 UTC.
+
+**Fila de relevo de sesiones** (bloque: `propuestas/transversal/2026-10-relevo-de-sesiones.md`; una por vez y una por carpeta principal). Se envía el bloque a una sesión y se espera su «lista para relevo» antes de la siguiente.
+- **Listas** (ramas locales con el Punto de retorno en su `ESTADO.md`, casi todas sin push): WhatsApp Modular (PR #151; el PR #150 espera el «sí» de Andres), RAG-Generico, SeguridadGeneral, Bancard, Firma CPC, NovuChat Principal.
+- **En pausa por decisión de Andres:** el resto de NovuChat (Constructora/Operadora, Cartera de clientes, Análisis financiero, rearquitectura). Su relevo es el 12/10, tras la noche de las etiquetas v0.15.x: **no enviar el bloque hasta que «NovuChat Sesion Principal» confirme el cierre de esa noche** (ella avisa con una línea).
+- **SeguroLoTengo Principal:** paso 0 hecho (sus scripts de captura quedaron versionados en la rama `linea/capturas-con-limite`, sin push). Su relevo, cuando no esté en marcha.
+- **Esta sesión:** relevada el 11/10.
+- Nada se archiva hasta que Andres abra y use la sesión nueva de cada proyecto; la verificación es leer el `ESTADO.md` de la rama local (no hacen falta PR). Las 17 ejecuciones de la rutina de Hipatia quedan **fuera** por decisión de Andres: recordárselo al terminar la ronda (ver memoria).
+
+**Decisiones que esperan a Andres:** (a) archivar los 11 «cerrar ya» directos (lista en `mediciones/claude/2026-10-inventario-de-sesiones.md`) y, más adelante, las de Hipatia; (b) qué hacer con las ramas y PR de `ESTADO.md` de las seis sesiones listas; (c) los puntos abiertos del pendiente 11 (cuentas de Google …5B3F y …44F7, reglas de asignación por negocio, dueño de `OnboardingGenerico` y de la WABA …1573, Lovable, Snyk y el dominio de Hipatia); (d) el token de Meta de Bellido, **en pausa**; (e) `devsecops` y `proyectos` en Sonnet, solo en los archivos de este repositorio; (f) recarga automática del crédito de Gemini con tope y un presupuesto con alertas en la cuenta C; (g) el informe de auditoría y el bloque `2026-10-cuota-estabilidad-y-delegacion.md` siguen **sin commit** en el árbol principal; (h) el tope opcional de tres sesiones principales (lo presentará SeguridadGeneral).
+
+**Verificaciones sin hacer:** OCI de septiembre (la sesión venció; Andres debe completar `oci session authenticate`) y Meta (sin sesión en el Chrome de Andres; sirve el CSV de Facturación). AWS ya está (PR #25).
+
+**Cuidados:** FinOps no cierra ni archiva sesiones ajenas, no edita otros repositorios y no envía bloques sin el «ya» de Andres. Las fichas de Claude-Proyectos quedan sin commit; las cierra ProyectosClaude. Las lecturas de Google/AWS se hacen con el rol de solo lectura y sin tocar la sesión de las otras sesiones (`GH_CONFIG_DIR`, perfil `finops` de AWS, `--account` de gcloud).
 
 ### Pendientes, por orden
 1. **Exportación de facturación a BigQuery — opción B (US multirregional): septiembre COMPLETO, línea base de Google v1.0 (2026-10-04).** Cuenta principal (…3EC8): bruto 10,40, créditos −10,40, neto 0,00 (98 % NovuChat); incluye una **instancia mínima fija de `novuchat-demo`, USD 0,54 por día desde el 17/09 (~16 al mes)**. Cuenta C: **Gemini API 24,91 USD** (21,74 el 29 y 30/09 —baterías de pruebas y concurso de Bellido, con credencial de producción y modelos no-lite—, 3,17 el resto). **El export sí muestra el consumo prepago de Gemini** (hipótesis contraria refutada) y el pronóstico de USD 169 de la consola es extrapolación, no gasto. Créditos de la principal: promoción mensual 5,18 + capa gratuita 5,22; **tope y vencimiento de la promoción sin verificar** (solo los ve Andres). PRETSO (…5B3F) e Hipatia producción (…44F7) siguen **sin medición**: no se exportan. Rutina del 06/10 solo como confirmación. Documentos: `mediciones/gcp/2026-09-linea-base-cuenta-{c,principal}.md`.
