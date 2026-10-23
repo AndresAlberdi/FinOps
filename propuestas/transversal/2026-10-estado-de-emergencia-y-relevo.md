@@ -1,7 +1,8 @@
 # Estado de emergencia, relevo de sesiones y conocimiento — propuesta única
 
 > Origen: FinOps-Ecosistema, 2026-10-16, por pedido de Andres.
-> **Veredicto del guardián (2026-10-16): aprobada con condiciones; esta versión incorpora las nueve (C1 a C9).** Como toca los guardarraíles §1.8 y §1.9 y la gobernanza del pipeline, **antes de entregarla a SeguridadGeneral pasa por el agente `seguridad`** (pendiente).
+> **Veredicto del guardián (2026-10-16): aprobada con condiciones; esta versión incorpora las nueve (C1 a C9).** Como toca los guardarraíles §1.8 y §1.9 y la gobernanza del pipeline, **antes de entregarla a SeguridadGeneral pasa por el agente `seguridad`**.
+> **Veredicto de `seguridad` (2026-10-23): aprobada con condiciones (0 críticos, 0 altos, 4 medios, 3 bajos); esta versión incorpora las ocho** (S1 a S8, marcadas en el texto). Quedan por confirmar los puntos que dependen de Andres (ver «Decisiones que esperan a Andres»).
 > Fuentes: notas de las sesiones «Optimización de emergencia» y «Optimizar consumo de créditos» (SeguroLoTengo, 2026-10-16); los relevos de WhatsApp-Modular, RAG y SeguridadGeneral (11 al 13-oct); la medición de tokens del 14-oct y el encargo del 14-oct (**ambos sin versionar** en la carpeta principal de FinOps: `mediciones/claude/2026-10-14-consumo-de-tokens.md` y `propuestas/transversal/2026-10-14-hallazgos-de-tokens-y-replanteo-post-viernes.md`).
 > Marcas: **[M]** medido (las cifras de tokens y dólares del 14-oct llevan margen ±30 % y las tarifas se verifican contra la página oficial antes de adoptar); **[O]** opinión de una sesión; **[V]** vivido en los relevos de FinOps.
 > No rediscute las decisiones A, B y C del modelo por rol ni la norma de ciclo de vida (`propuestas/seguridad-general/2026-10-ciclo-de-vida-de-sesiones.md`); las completa.
@@ -14,27 +15,34 @@
 - **[V]** En los tres relevos de FinOps hubo conocimiento solo en la cabeza de la antigua: RAG (4 pendientes y 10 reglas), WAM (9 pendientes y 10 reglas), SeguridadGeneral (5 pendientes y 7 reglas).
 
 ## 1. Estado de emergencia
-**Regla de Andres (2026-10-16), que manda sobre el resto:** si la cuota **semanal** llega al **90 %** se pasa a **MODO EMERGENCIA**: se cierran las rutinas, se evitan las tareas automáticas, se paran las sesiones y las prioridades se deciden con Andres, que toma desde ahí las decisiones sobre los recursos escasos. Los demás niveles son una propuesta de FinOps para anticiparlo (las dos notas de SeguroLoTengo coinciden en la idea, no en los números; los umbrales distintos del 90 % son **[O]** hasta que Andres los fije):
+**Regla de Andres (2026-10-16), que manda sobre el resto:** si la cuota **semanal** llega al **90 %** se pasa a **MODO EMERGENCIA**: se cierran las rutinas, se evitan las tareas automáticas **que consumen cuota de Claude** (no incluye CI, Dependabot, escáneres ni monitores externos: son controles del pipeline, **S6**), se paran las sesiones y las prioridades se deciden con Andres, que toma desde ahí las decisiones sobre los recursos escasos. Los demás niveles son una propuesta de FinOps para anticiparlo (las dos notas de SeguroLoTengo coinciden en la idea, no en los números; los umbrales distintos del 90 % son **[O]** hasta que Andres los fije):
 
 | Nivel | Se entra cuando | Qué cambia |
 |---|---|---|
-| **Normal** | semanal <80 % y extra gastado <70 % del tope mensual | Sonnet con esfuerzo medio; rutinas activas; el crédito extra no se usa como presupuesto de trabajo. |
+| **Normal** | semanal <80 % y extra gastado <70 % del tope mensual | Sonnet con esfuerzo medio, y Opus en sesión corta para planificar y revisar (**S7**); rutinas activas; el crédito extra no se usa como presupuesto de trabajo. |
 | **Alerta** **[O]** | semanal ≥80 %, o extra gastado ≥70 % | Aviso a Andres; sin agentes ni flujos en paralelo; estimación antes de tareas grandes; `get_usage` al empezar y al terminar cada bloque. |
-| **MODO EMERGENCIA** (regla de Andres) | semanal ≥90 % | Se cierran las rutinas que no estén en la lista protegida, se evitan las tareas automáticas, se paran las sesiones y Andres define las prioridades. Exploración en Haiku; Opus solo para planificar en una sesión corta; no se retoman sesiones largas. |
+| **MODO EMERGENCIA** (regla de Andres) | semanal ≥90 % | Se cierran las rutinas que no estén en la lista protegida, se evitan las tareas automáticas que consumen cuota (**S6**), se paran las sesiones y Andres define las prioridades. Exploración en Haiku; Opus para planificar en una sesión corta y, siempre, para revisión y seguridad (la lista protegida prevalece sobre esta fila, **S1**); no se retoman sesiones largas. |
 | **Parada del crédito extra** **[O]** | extra gastado ≥85 % del tope (102 USD de 120; la sesión «Optimización de emergencia» informa que Andres lo fijó el 15-oct: Andres lo confirma) | No se gasta más crédito extra; solo la excepción de incidentes. |
 
 **Lista protegida: nada de esto se pausa ni se baja en ningún nivel (C1, C2).**
 - Producción y el monitoreo operativo externo.
 - **Las rutinas y agentes de seguridad y de monitoreo** (por ejemplo `app-check-hipatia`, que informa decisiones de seguridad, no es producción pero no se pausa por defecto).
-- **Los agentes de revisión, el guardián y `seguridad` conservan Opus en todos los niveles** (guardarraíl §1.9, decisión C).
+- **Los agentes de revisión, el guardián y `seguridad` conservan Opus en todos los niveles** (guardarraíl §1.9, decisión C). **Lista nominal (S5), alineada con `~/SeguridadGeneral/04-claude-code/README.md`:** `guardian-calidad-seguridad`, `seguridad`, `revisor-codigo`, `planificador`, `devsecops` y `proyectos` en Opus, y los agentes que firman fases o calculan costos según ese README; la rutina `app-check-hipatia` y cualquier rutina de monitoreo de seguridad. Bajar de modelo `devsecops` o `proyectos` exige un cambio en SeguridadGeneral, no una decisión de FinOps.
+- **Ningún nivel dispensa el «sí» de Andres, la compuerta del PR (`compuerta-pr`) ni la revisión de `seguridad` y de `revisor-codigo` en Opus (S1).** Si no hay cuota para revisar, el PR espera; no se fusiona. Cuando esta lista choca con una fila de la tabla, prevalece la lista.
+- **Reserva mínima para incidentes y revisión de seguridad (S4):** una parte de la cuota semanal queda fuera de cualquier excepción de umbral; **el número lo decide Andres** (ver «Decisiones que esperan a Andres»).
 - La salida de Haiku la verifica la sesión que decide con ella (decisión B).
 - **Excepción de incidentes en Parada:** rotación de secretos, CVE crítico y caída de producción se atienden, con el «sí» de Andres y estimación previa.
+
+**Excepciones de umbral registradas (S4).** Una excepción de umbral solo mueve el umbral de cuota: no dispensa la lista protegida, el «sí» por acción ni la revisión por PR.
+- 2026-10-22: Andres autorizó en el chat de FinOps que las sesiones de NovuChat (Principal, Cartera, Cartera 2, Rearquitectura, Constructora y Novuchat chat) usen recursos hasta el **99 %** semanal (antes 95 %). Las demás sesiones siguen con los umbrales de esta propuesta.
+- 2026-10-23: Andres ordenó en el chat de FinOps «que no hagan caso a la cuota y trabajen regularmente». Rige hasta que él diga otra cosa; el crédito extra de Claude sigue sin usarse salvo orden expresa suya. **Pendiente:** que Andres fije si vence con un plazo (el reinicio semanal del 23-oct 08:00 UTC ya pudo dejar sin efecto la del 99 %).
 
 **Hoy (16-oct):** semanal 0 % (se reinició; Andres retomó su cuota) ⇒ **Normal** por la regla de Andres. El extra gastado está en 74 % (89,12 de 120 USD), por encima del umbral de Alerta **[O]**: la reserva de crédito es de ~31 USD, así que el crédito extra no se usa para trabajar. La serie diaria se reactivó el 16-oct y su respuesta empieza con «MODO EMERGENCIA» cuando el semanal sea ≥90 % (aviso solamente: el cierre de rutinas lo ejecuta FinOps con el «sí» de Andres).
 
 **Salida:** tras el reinicio semanal; la hace Andres con su «sí» y las rutinas se reactivan una por una.
 
 **Rutinas.** No heredan Sonnet y las herramientas no permiten fijar su modelo (pendiente 12 de `ESTADO.md`); lo fija Andres en el panel «Programadas». Al pausar una, se marca «pausada» en la serie diaria para que el hueco no parezca una falla. La rutina de cuota, al reactivarse, queda con modelo bajo fijado por Andres.
+**Avisos que dependen de la laptop (S3).** La serie diaria de cuota y `get_usage` son **avisos**, no monitoreo operativo, y dependen de la app de escritorio (política general del 11/10/2026, puntos 1, 2 y 5). Regla de latido: si `serie-cuota.tsv` no tiene lectura del día, la sesión de FinOps lo trata como alerta al empezar la jornada y lo informa a Andres. Pendientes: evaluar un sondeo externo gratuito si el límite del plan resulta legible desde fuera (hoy no está verificado) y **verificar dónde corre `app-check-hipatia`** (nube o app local), que no consta.
 **Despertar sesiones.** No se envía mensaje a una sesión inactiva con contexto grande sin el «sí» de Andres; para leer su estado se usan archivos y ramas (`git show`), que no cuestan créditos.
 
 ## 2. Relevo de sesiones sin perder conocimiento
@@ -45,6 +53,7 @@
 3. La nueva lee `CLAUDE.md` y el `ESTADO.md` de la rama del relevo y responde su lista en el mismo formato.
 4. FinOps compara antigua, nueva y archivo, y entrega una tabla (coincide / solo en la antigua / solo en la nueva); verifica el commit con `git show`.
 5. Con el OK de Andres se archiva la antigua (puede fallar por permisos del modo automático: entonces lo hace Andres). No se desarchiva salvo necesidad probada.
+**Qué no se escribe en un traspaso (S2).** La lista de relevo, `ESTADO.md` y M4 nombran los secretos solo por su nombre en Secret Manager o en Secrets; nunca valores, IP, IDs completos de cuenta o proyecto, correos completos ni contenido de `*.tfvars`, `.env` o `datos/`. De M4 se registra la ruta y la forma de verificarla, nunca el contenido. Antes de cada commit de relevo se corre `gitleaks git` (o `./security-local.sh`), y la sesión receptora lo comprueba en el paso 4. Si se detecta un secreto, primero se avisa a Andres para rotarlo; no se limpia el historial por cuenta propia. A `~/CLAUDE_DESCARGAS/` van solo entregables: no extractos de `datos/` ni archivos con credenciales, y lo que esté ahí no es fuente con autoridad para reconstruir: se contrasta con git.
 **Quién verifica:** quien recibe: lee el archivo y lista lo que entendió antes de actuar.
 
 **Relevo y emergencia (C4).** El relevo se hace **antes** de entrar en Emergencia o en la primera oportunidad. Si el nivel ya es Emergencia o Parada, el relevo es excepción y se hace con el «sí» de Andres por sesión, porque perder conocimiento cuesta más que releer. **Si la antigua es inalcanzable** (Parada, contexto agotado o archivada): se reconstruye desde `ESTADO.md`, las ramas, `~/CLAUDE_DESCARGAS/` y la memoria; los huecos se escriben en `ESTADO.md` como «conocimiento no recuperado» y Andres decide si se desarchiva.
@@ -70,7 +79,7 @@
 - **Ahorro:** hipótesis sin medir (invariante 8); no se afirma hasta tener al menos dos semanas comparables.
 
 ## Entrega (por bloque)
-- **Bloque 1 — FinOps, rama y PR propios:** este documento, la medición de tokens y el encargo del 14-oct, hoy sin versionar. Solo documentación. **Costo:** una sesión corta en Sonnet. **Prueba:** `git status` limpio y gitleaks sin hallazgos. Con el «sí» de Andres para el push.
+- **Bloque 1 — FinOps, rama y PR propios:** este documento, la medición de tokens y el encargo del 14-oct, hoy sin versionar. Solo documentación. **Costo:** una sesión corta en Sonnet. **Prueba:** `git status` limpio y gitleaks sin hallazgos; además, que los dos archivos sin versionar del 14-oct no contengan IDs de sesión, de cuenta ni cifras desagregadas de facturación (invariante 6) (**S8**). Con el «sí» de Andres para el push.
 - **Bloque 2 — SeguridadGeneral (su repositorio, su sesión):** incorporar la norma a su README §2.4 junto con la de ciclo de vida, **tras** la revisión de `seguridad`. No se edita su repositorio desde aquí.
 
 ## Decisiones que esperan a Andres
@@ -78,6 +87,8 @@
 2. **El tope de tres sesiones principales simultáneas (C8):** sigue siendo decisión opcional de Andres; esta propuesta recomienda 1 escritora a la vez y 3 como techo, pero no lo impone.
 3. Reactivar `finops-serie-cuota-diaria` (pausada desde el 14-oct) y fijar su modelo en el panel «Programadas».
 4. Llevar a commit los archivos sin versionar de la carpeta principal (Bloque 1).
+5. **Reserva mínima de cuota para incidentes y revisión de seguridad (S4):** cuántos puntos quedan fuera de cualquier excepción de umbral.
+6. **Vencimiento de las excepciones de umbral del 22 y 23-oct (S4).**
 
 ## Lo que NO se construye
 - Un monitor automático que cambie de nivel solo: depende de que los límites del plan sean legibles desde fuera de la app, lo que no está verificado.
