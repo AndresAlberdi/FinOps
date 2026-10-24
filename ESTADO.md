@@ -1,12 +1,26 @@
 # ESTADO — FinOps-Ecosistema
 
-**Última actualización:** 2026-10-16 (relevo de sesión de FinOps)
+**Última actualización:** 2026-10-24 (relevo de sesión de FinOps)
 
 ## Punto de retorno (leer primero al abrir una sesión)
 
 **Contexto:** Andres consiguió créditos de Claude con la condición de consumir el equivalente a una semana en 40 horas (ventana iniciada ~2026-09-30 19:00 UTC; plan Max, cuota semanal en 4 % al iniciar; ver `mediciones/claude/2026-09-linea-base.md` §3 y §6). **Prioridad:** NovuChat, SeguroLoTengo, SeguridadGeneral, WhatsApp-Modular, Claude-Proyectos y PRETSO. Esta sesión corre en Sonnet 5.5.
 
 **Repositorio:** `AndresAlberdi/FinOps` (GEN, público). `main` protegido por el ruleset 24272555: sin borrado ni force-push, historial lineal, PR con 1 aprobación y revisión de propietario, `compuerta-pr` obligatorio y al día, **solo squash**. Toda escritura en `main` pasa por PR; la aprobación la da `segurolotengopy` con el OK de Andres en el chat. Estándar DevSecOps v2 con el stack `solo-ci` (PR #1 fusionado, `2313d55`); desvíos en `docs/05`.
+
+### Retomar aquí (relevo de sesión, 2026-10-24) — manda sobre lo de abajo
+
+Traspaso completo en `~/CLAUDE_DESCARGAS/FINOPS_traspaso-sesion-principal_2026-10-24.md` (fuera de git). La sesión «FinOps Sesion Principal» llegó al 76 % de contexto. Reglas de Andres vigentes: **botones y nunca texto**; coordinación con las sesiones automática; su «sí» solo para acciones reales; sin mensajes duplicados. Crédito extra de Claude (74 %) sin usar.
+
+**Hecho desde el 16/10:** #32 fusionado (propuesta de emergencia con S1–S8, enviada a SeguridadGeneral, que la llevó a su PR #65 §2.4.1). PR abiertos esperando a Andres: **#33** (mediciones de octubre al 22: AWS 29,55 USD frente a 3,93 en septiembre; WAF ≈41 USD/mes frente a los ~16 aprobados, un solo ACL; GitHub ≈3.623 min [estimación]), **#34** (política de disco y worktrees), **#35** (lectura de IAM para el rol `finops-lectura`, ya aplicada con veredicto de `seguridad`) y **#36** (`SECURITY.md`, con el reporte privado de vulnerabilidades habilitado el 24/10). Clave estática `…47WA` del usuario Administradores **desactivada** el 24/10 (reversible).
+
+**Pendientes (resumen; la tabla con ID está en el traspaso):**
+1. Andres: aprobar #33–#36; recargar las 12 líneas Tigo y pasar fecha y monto (los avisos de Calendar son del 24/10; peor caso vencen el 31/10); consultar a Tigo 7 preguntas.
+2. Decisiones de Andres: costo real del WAF; contar builds de Amplify por rama (requiere permiso de lectura de Amplify); calibrar GitHub con Facturación → Uso (el presupuesto de USD 10 se agota hacia el 26/10); restringir la confianza de `finops-lectura` a su usuario; las 6 alertas Scorecard (#1, #10, #11, #12, #13, #14); reserva mínima de cuota para incidentes; qué retirar de los 27 worktrees de SeguroLoTengo y los ≈20 GB de NovuChat; relevos de SeguroLoTengo Principal, Bancard, Firma CPC y Novuchat chat; subir o no los commits locales de las sesiones.
+3. FinOps: comprobar las fórmulas de la hoja v4 de líneas; crear el siguiente aviso por línea con las fechas reales; medir OCI (requiere `oci session authenticate`) y Meta; PRETSO e Hipatia sin export; cerrar septiembre y octubre reales; entregar `con-limite.sh`; edición única de `CLAUDE.md` (`recolector-costos` usa Haiku).
+4. **Revisar el 2027-01-22 como máximo** el descarte de las 9 alertas PinnedDependencies (pip sin hash en copias de las plantillas de SeguridadGeneral) y pedir a SeguridadGeneral su pendiente de pip con hash (versión fija para `ruff` y `pytest`).
+
+**Cuidados nuevos:** el rol `finops-lectura` ahora lee metadatos de IAM (sin comodines; cualquier ampliación pasa por `seguridad`); un script no puede guardar credenciales del rol en un archivo; el clasificador bloquea fusionar sin un «fusiona N» explícito de Andres.
 
 ### Retomar aquí (relevo de sesión, 2026-10-16)
 
