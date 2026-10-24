@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "FinOpsMetadatosClavesDeUsuario",
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListUsers",
+        "iam:GetUser",
+        "iam:ListAccessKeys",
+        "iam:GetAccessKeyLastUsed"
+      ],
+      "Resource": "arn:aws:iam::<CUENTA>:user/*"
+    },
+    {
+      "Sid": "FinOpsResumenDeCuenta",
+      "Effect": "Allow",
+      "Action": "iam:GetAccountSummary",
+      "Resource": "*"
+    }
+  ]
+}
