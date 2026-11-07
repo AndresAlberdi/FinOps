@@ -1,0 +1,124 @@
+# =============================================================================
+# vigilancia-oci.yml — Vigilancia de solo lectura de los límites gratuitos de OCI
+# Versión: 0.1 (borrador, sin activar) | Fecha: 2026-11-07
+# Propuesta: propuestas/oci/2026-11-vigilancia-oci-en-actions.md
+# -----------------------------------------------------------------------------
+# - Solo `schedule` y `workflow_dispatch`: nunca pull_request_target ni forks.
+# - Identidad federada: token OIDC de GitHub -> token de sesión (UPST) de OCI de
+#   corta vida, ligado a un usuario de servicio de solo lectura. Sin llaves de
+#   API. El único secreto estático es el de la aplicación confidencial del
+#   dominio de identidad, en el Environment (rotación cada 90 días).
+# - Registro PÚBLICO: el script solo imprime «OK» / «SUPERADO» por medida.
+# - El trabajo falla al superar un umbral: GitHub envía el correo de fallo.
+# =============================================================================
+name: vigilancia-oci
+
+on:
+  schedule:
+    - cron: "17 11 * * *" # diario, 11:17 UTC (bucket y memoria)
+    - cron: "43 11 * * 0" # domingos 11:43 UTC (costo, cómputo y disco)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vigilancia-oci
+  cancel-in-progress: false
+
+jobs:
+  vigilar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: oci-lectura # Environment dedicado, limitado a la rama main
+    permissions:
+      contents: read
+      id-token: write # token OIDC de GitHub para la federación con OCI
+    env:
+      OCI_PROFILE: UPST
+      # Identificadores como SECRETOS del Environment: GitHub enmascara los
+      # secretos y muestra los `vars` sin enmascarar en un registro público.
+      OCI_TENANCY: ${{ secrets.OCI_TENANCY }}
+      OCI_COMPARTMENT: ${{ secrets.OCI_COMPARTMENT }}
+      OCI_NAMESPACE: ${{ secrets.OCI_NAMESPACE }}
+      OCI_BUCKET: ${{ secrets.OCI_BUCKET }}
+      OCI_REGION: ${{ secrets.OCI_REGION }}
+      # Debe coincidir con el `aud` fijado en la confianza (Identity Propagation Trust).
+      OIDC_AUDIENCE: ${{ vars.OCI_OIDC_AUDIENCE || secrets.OCI_DOMAIN_URL }}
+      HEARTBEAT_URL: ${{ secrets.HEARTBEAT_URL }}
+    steps:
+      - name: Código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Instalar la CLI de OCI
+        run: python -m pip install --quiet "oci-cli==3.96.0"
+        # Versión fijada. Si la CLI se actualiza, subir la versión con un PR.
+
+      - name: Sesión OCI por federación (sin registrar valores)
+        env:
+          OCI_DOMAIN_URL: ${{ secrets.OCI_DOMAIN_URL }}
+          OCI_CLIENT_ID: ${{ secrets.OCI_CLIENT_ID }}
+          OCI_CLIENT_SECRET: ${{ secrets.OCI_CLIENT_SECRET }}
+        run: |
+          set +x
+          set -o pipefail
+          umask 077
+          dir="${RUNNER_TEMP}/oci"
+          mkdir -p "$dir"
+
+          # Par de claves efímero: la pública viaja en el intercambio y queda
+          # en el token; la privada nunca sale del ejecutor.
+          openssl genrsa -out "$dir/privada.pem" 2048 2>/dev/null
+          openssl rsa -in "$dir/privada.pem" -pubout -out "$dir/publica.pem" 2>/dev/null
+
+          # Token OIDC de GitHub, con el público (aud) de la confianza.
+          jwt=$(curl -sS --fail -G -H "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            --data-urlencode "audience=${OIDC_AUDIENCE}" "${ACTIONS_ID_TOKEN_REQUEST_URL}" 2>/dev/null | python3 -c 'import sys,json; print(json.load(sys.stdin)["value"])' 2>/dev/null) || {
+              echo "FALLO: no se pudo obtener el token OIDC"; exit 1; }
+          echo "::add-mask::${jwt}"
+
+          # Intercambio JWT -> UPST (Oracle: «Token Exchange Grant Type:
+          # Exchanging a JSON Web Token for a UPST», consultado 2026-11-07).
+          # La forma exacta de public_key (PEM sin cabeceras) se confirma en la
+          # primera ejecución manual.
+          pub=$(grep -v -- '-----' "$dir/publica.pem" | tr -d '\n')
+          upst=$(curl -sS --fail -u "${OCI_CLIENT_ID}:${OCI_CLIENT_SECRET}" \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
+            --data-urlencode 'requested_token_type=urn:oci:token-type:oci-upst' \
+            --data-urlencode "public_key=${pub}" \
+            --data-urlencode "subject_token=${jwt}" \
+            --data-urlencode 'subject_token_type=jwt' \
+            "${OCI_DOMAIN_URL%/}/oauth2/v1/token" 2>/dev/null | python3 -c 'import sys,json; print(json.load(sys.stdin)["token"])' 2>/dev/null) || {
+              echo "FALLO: no se pudo obtener la sesión de OCI"; exit 1; }
+          echo "::add-mask::${upst}"
+          printf '%s' "$upst" > "$dir/token"
+
+          mkdir -p "${HOME}/.oci"
+          cat > "${HOME}/.oci/config" <<EOF
+          [UPST]
+          tenancy=${OCI_TENANCY}
+          region=${OCI_REGION}
+          security_token_file=${dir}/token
+          key_file=${dir}/privada.pem
+          EOF
+
+      - name: Medir
+        env:
+          MODO: ${{ github.event.schedule == '43 11 * * 0' && 'semanal' || (github.event.schedule == '17 11 * * *' && 'diario' || 'todo') }}
+        run: bash scripts/oci/vigilar_oci.sh
+
+      - name: Latido (opcional)
+        if: success() && env.HEARTBEAT_URL != ''
+        run: curl -sS --fail --max-time 10 "$HEARTBEAT_URL" > /dev/null
+
+      - name: Borrar claves y token temporales
+        if: always()
+        run: rm -rf "${RUNNER_TEMP}/oci" "${HOME}/.oci"
