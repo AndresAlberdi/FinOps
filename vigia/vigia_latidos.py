@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Vigía de latidos de FinOps: revisa que cada monitor programado siga vivo y envía
 UN correo-resumen diario (contrato avisos-correo/v1, receta sin Node).
 
@@ -39,7 +38,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 VERSION = "1"
@@ -49,10 +48,25 @@ CONCLUSIONES = {
     "success", "failure", "cancelled", "skipped", "timed_out",
     "action_required", "neutral", "stale", "startup_failure",
 }  # fmt: skip
-RE_PROYECTO = re.compile(r"^(?!.*\d{5})[a-z][a-z0-9-]{1,29}$")  # sin rachas que el detector rechace
+RE_PROYECTO = re.compile(
+    r"^(?!.*\d{5})[a-z][a-z0-9-]{1,29}$"
+)  # sin rachas que el detector rechace
 RE_DE = re.compile(r"^alertas-finops@[A-Za-z0-9][A-Za-z0-9.-]{1,100}$")
 FALLOS = {"failure", "timed_out", "startup_failure"}
-PREFIJOS_SECRETO = ("re_", "bearer ", "ghp_", "gho_", "ghs_", "github_pat_", "akia", "aiza", "xox", "eaa", "eyj", "-----begin")
+PREFIJOS_SECRETO = (
+    "re_",
+    "bearer ",
+    "ghp_",
+    "gho_",
+    "ghs_",
+    "github_pat_",
+    "akia",
+    "aiza",
+    "xox",
+    "eaa",
+    "eyj",
+    "-----begin",
+)
 PRESUPUESTO_S = 240  # tiempo total para consultar a GitHub; el resto pasa a sin_datos
 TIMEOUT_S = 15
 RE_REPO = re.compile(r"^([A-Za-z0-9][A-Za-z0-9-]{0,38})/([A-Za-z0-9._-]{1,100})$")
@@ -86,7 +100,12 @@ def cargar_config(ruta):
     for e in latidos:
         if not isinstance(e, dict):
             raise ErrorConfig("config_entrada")
-        p, r, w, h = (e.get("proyecto"), e.get("repositorio"), e.get("workflow"), e.get("max_horas"))
+        p, r, w, h = (
+            e.get("proyecto"),
+            e.get("repositorio"),
+            e.get("workflow"),
+            e.get("max_horas"),
+        )
         if not (isinstance(p, str) and RE_PROYECTO.match(p)):
             raise ErrorConfig("config_proyecto")
         if not (isinstance(r, str) and RE_REPO.match(r)):
@@ -124,8 +143,10 @@ def consultar(entrada, token, estado, abrir=ABRIR, dormir=time.sleep):
     (conclusion, actualizado_en), o None si no hay datos. Un error de red se
     reintenta una vez; cualquier otro fallo es «sin datos», sin propagar texto."""
     url = (
-        "https://api.github.com/repos/%s/actions/workflows/%s/runs"
-        "?status=%s&per_page=1" % (entrada["repositorio"], entrada["workflow"], estado)
+        "https://api.github.com/repos/{}/actions/workflows/{}/runs"
+        "?status={}&per_page=1".format(
+            entrada["repositorio"], entrada["workflow"], estado
+        )
     )
     req = _peticion(
         url, token,
@@ -141,7 +162,7 @@ def consultar(entrada, token, estado, abrir=ABRIR, dormir=time.sleep):
             break
         except urllib.error.HTTPError:
             return None  # 3xx, 4xx, 5xx de la API: sin datos
-        except Exception:  # noqa: BLE001 - red o JSON ilegible
+        except Exception:  # noqa: BLE001, S112 - red o JSON ilegible
             continue
     try:
         runs = datos["workflow_runs"]
@@ -159,7 +180,7 @@ def consultar(entrada, token, estado, abrir=ABRIR, dormir=time.sleep):
 
 
 def _fecha(texto):
-    return datetime.strptime(texto, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    return datetime.strptime(texto, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
 
 
 def clasificar(exito, ultimo, ahora, max_horas):
@@ -183,17 +204,21 @@ def armar_aviso(resultados, ahora):
     vivos = sum(1 for _, e, _ in resultados if e == "vivo")
     nivel = "informativo" if vivos == total else "urgente"
     if nivel == "informativo":
-        titular = "Todos los latidos vivos (%d de %d)" % (vivos, total)
+        titular = f"Todos los latidos vivos ({vivos} de {total})"
         espera = "nada"
-        asunto = "Latidos: todos vivos (%d)" % total
+        asunto = f"Latidos: todos vivos ({total})"
     else:
-        titular = "%d de %d latidos sin vivir" % (total - vivos, total)
-        espera = "Revisar los latidos marcados; Claude propone el arreglo y usted autoriza"
-        asunto = "Latidos: %d de %d sin vivir" % (total - vivos, total)
+        titular = f"{total - vivos} de {total} latidos sin vivir"
+        espera = (
+            "Revisar los latidos marcados; Claude propone el arreglo y usted autoriza"
+        )
+        asunto = f"Latidos: {total - vivos} de {total} sin vivir"
     lineas = [titular]
     for proyecto, estado, horas in resultados:
         lineas.append(
-            "%s: %s%s" % (proyecto, estado, "" if horas is None else " (hace %d h)" % horas)
+            "{}: {}{}".format(
+                proyecto, estado, "" if horas is None else f" (hace {horas} h)"
+            )
         )
     fecha = ahora.strftime("%Y-%m-%d-%H%M")
     return {
@@ -212,7 +237,11 @@ def armar_aviso(resultados, ahora):
 def validar_aviso(a):
     """Validador MÍNIMO (no espejo completo del corpus de WAM: se declara en la ficha,
     como la receta curl). Si algo no cuadra, el envío se aborta; nunca se redacta."""
-    if a["contrato"] != "avisos-correo/v1" or a["nivel"] not in ("urgente", "aviso", "informativo"):
+    if a["contrato"] != "avisos-correo/v1" or a["nivel"] not in (
+        "urgente",
+        "aviso",
+        "informativo",
+    ):
         return False
     if not RE_PROYECTO.match(a["proyecto"]) or a["enlace"] != ENLACE:
         return False
@@ -248,14 +277,14 @@ def validar_aviso(a):
 
 def formatear(a):
     nivel = a["nivel"].upper()
-    asunto = "[AAB1 %s] %s · %s" % (nivel, a["proyecto"], a["asunto"])
+    asunto = "[AAB1 {}] {} · {}".format(nivel, a["proyecto"], a["asunto"])
     primera, _, resto = a["que_paso"].partition("\n")
-    cuerpo = "%s · %s · %s\nQué se espera de Andres: %s\nQué pasó: %s\n" % (
+    cuerpo = "{} · {} · {}\nQué se espera de Andres: {}\nQué pasó: {}\n".format(
         nivel, a["proyecto"], a["ocurrido_en"], a["que_se_espera_de_andres"], primera,
     )  # fmt: skip
     if resto:
         cuerpo += resto + "\n"
-    cuerpo += "Enlace: %s\n\nref %s:%s · contrato avisos-correo/v1\n" % (
+    cuerpo += "Enlace: {}\n\nref {}:{} · contrato avisos-correo/v1\n".format(
         a["enlace"], a["proyecto"], a["id_unico"],
     )  # fmt: skip
     cuerpo += (
@@ -271,7 +300,11 @@ def _nombre_error(e):
         nombre = json.load(e).get("name")
     except Exception:  # noqa: BLE001
         return ""
-    return nombre if isinstance(nombre, str) and re.match(r"^[a-z_]{1,60}$", nombre) else ""
+    return (
+        nombre
+        if isinstance(nombre, str) and re.match(r"^[a-z_]{1,60}$", nombre)
+        else ""
+    )
 
 
 REINTENTABLES = {"concurrent_idempotent_requests", "rate_limit_exceeded"}
@@ -283,13 +316,13 @@ def enviar(aviso, clave, de, para, abrir=ABRIR, dormir=time.sleep):
     cerrada: enviado | reintentos_agotados | cuota_agotada | rechazo_proveedor."""
     asunto, cuerpo = formatear(aviso)
     carga = {
-        "from": "AAB1 avisos · finops <%s>" % de,
+        "from": f"AAB1 avisos · finops <{de}>",
         "to": [para],
         "subject": asunto,
         "text": cuerpo,
-        "html": "<pre>%s</pre>" % html.escape(cuerpo),
+        "html": f"<pre>{html.escape(cuerpo)}</pre>",
     }
-    llave = "%s:%s" % (aviso["proyecto"], aviso["id_unico"])
+    llave = "{}:{}".format(aviso["proyecto"], aviso["id_unico"])
     for espera in (0, 1, 4):
         if espera:
             dormir(espera)
@@ -309,7 +342,7 @@ def enviar(aviso, clave, de, para, abrir=ABRIR, dormir=time.sleep):
             if nombre in CUOTA:
                 return "cuota_agotada"
             return "rechazo_proveedor"  # el resto de los 4xx, incluido un 409 de carga distinta
-        except Exception:  # noqa: BLE001 - red
+        except Exception:  # noqa: BLE001, S112 - red
             continue
     return "reintentos_agotados"
 
@@ -318,7 +351,7 @@ def latido(url, abrir=ABRIR):
     try:
         with abrir(_peticion(url), timeout=10):
             pass
-    except Exception:  # noqa: BLE001 - el latido es un aviso aparte; no rompe el trabajo
+    except Exception:  # noqa: BLE001, S110 - el latido es un aviso aparte; no rompe el trabajo
         pass
 
 
@@ -327,7 +360,7 @@ def linea_registro(aviso, resultado, detalle, vivos=None, total=None):
         {
             "evento": "vigia_latidos",
             "proyecto": PROYECTO,
-            "ref": "%s:%s" % (PROYECTO, aviso["id_unico"]) if aviso else "",
+            "ref": "{}:{}".format(PROYECTO, aviso["id_unico"]) if aviso else "",
             "nivel": aviso["nivel"] if aviso else "",
             "resultado": resultado,
             "detalle": detalle,
@@ -339,7 +372,15 @@ def linea_registro(aviso, resultado, detalle, vivos=None, total=None):
     )
 
 
-def ejecutar(ruta_config, entorno, ahora, abrir=ABRIR, dormir=time.sleep, seco=False, reloj=time.monotonic):
+def ejecutar(
+    ruta_config,
+    entorno,
+    ahora,
+    abrir=ABRIR,
+    dormir=time.sleep,
+    seco=False,
+    reloj=time.monotonic,
+):
     try:
         latidos = cargar_config(ruta_config)
     except ErrorConfig as e:
@@ -365,12 +406,23 @@ def ejecutar(ruta_config, entorno, ahora, abrir=ABRIR, dormir=time.sleep, seco=F
         print(asunto)
         print(cuerpo)
         return 0
-    clave, de, para = (entorno.get(k, "") for k in ("AVISOS_RESEND_API_KEY", "AVISOS_DE", "AVISOS_PARA"))
+    clave, de, para = (
+        entorno.get(k, "")
+        for k in ("AVISOS_RESEND_API_KEY", "AVISOS_DE", "AVISOS_PARA")
+    )
     if not (clave and para and RE_DE.match(de)):
         print(linea_registro(aviso, "error", "configuracion", vivos, len(resultados)))
         return 13
     detalle = enviar(aviso, clave, de, para, abrir, dormir)
-    print(linea_registro(aviso, "ok" if detalle == "enviado" else "error", detalle, vivos, len(resultados)))
+    print(
+        linea_registro(
+            aviso,
+            "ok" if detalle == "enviado" else "error",
+            detalle,
+            vivos,
+            len(resultados),
+        )
+    )
     if detalle == "enviado":
         if entorno.get("HEARTBEAT_URL"):
             latido(entorno["HEARTBEAT_URL"], abrir)
@@ -380,7 +432,7 @@ def ejecutar(ruta_config, entorno, ahora, abrir=ABRIR, dormir=time.sleep, seco=F
 
 def main(argv):
     ruta = Path(__file__).resolve().parent / "latidos.json"
-    return ejecutar(ruta, os.environ, datetime.now(timezone.utc), seco="--seco" in argv)
+    return ejecutar(ruta, os.environ, datetime.now(UTC), seco="--seco" in argv)
 
 
 if __name__ == "__main__":

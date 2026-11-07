@@ -4,17 +4,20 @@ import importlib.util
 import io
 import json
 import urllib.error
-from datetime import datetime, timezone
+import urllib.parse
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
 RAIZ = Path(__file__).resolve().parent.parent
-ESPEC = importlib.util.spec_from_file_location("vg", RAIZ / "vigia" / "vigia_latidos.py")
+ESPEC = importlib.util.spec_from_file_location(
+    "vg", RAIZ / "vigia" / "vigia_latidos.py"
+)
 vg = importlib.util.module_from_spec(ESPEC)
 ESPEC.loader.exec_module(vg)
 
-AHORA = datetime(2026, 11, 8, 12, 30, 0, tzinfo=timezone.utc)
+AHORA = datetime(2026, 11, 8, 12, 30, 0, tzinfo=UTC)
 ENTRADA = {"proyecto": "wam", "repositorio": "segurolotengopy/WhatsAppModular",
            "workflow": "latido-receptor.yml", "max_horas": 14}  # fmt: skip
 
@@ -30,7 +33,13 @@ class Resp(io.BytesIO):
 
 
 def run(conclusion="success", actualizado="2026-11-08T10:30:00Z"):
-    runs = [{"conclusion": conclusion, "updated_at": actualizado, "display_title": "SECRETO"}]
+    runs = [
+        {
+            "conclusion": conclusion,
+            "updated_at": actualizado,
+            "display_title": "SECRETO",
+        }
+    ]
     return Resp(json.dumps({"workflow_runs": runs}).encode())
 
 
@@ -39,7 +48,11 @@ def vacio():
 
 
 def error(codigo, nombre=None):
-    cuerpo = io.BytesIO(json.dumps({"name": nombre, "message": "TEXTO"}).encode()) if nombre else None
+    cuerpo = (
+        io.BytesIO(json.dumps({"name": nombre, "message": "TEXTO"}).encode())
+        if nombre
+        else None
+    )
     return urllib.error.HTTPError("u", codigo, "x", {}, cuerpo)
 
 
@@ -56,6 +69,11 @@ def entorno(**extra):
     return e
 
 
+def host(url):
+    # host exacto de la URL, no una subcadena (CodeQL: incomplete-url-substring-sanitization)
+    return urllib.parse.urlsplit(url).hostname
+
+
 def abridor(exito=None, completado=None, resend=None, vistos=None):
     """GitHub responde según `status=` de la URL; Resend, con la función `resend`."""
     exito = exito if exito is not None else run()
@@ -64,13 +82,15 @@ def abridor(exito=None, completado=None, resend=None, vistos=None):
     def abrir(req, timeout):
         url = req.full_url
         if vistos is not None:
-            vistos.append((url, {k.lower(): v for k, v in req.header_items()}, req.data))
-        if "api.github.com" in url:
+            vistos.append(
+                (url, {k.lower(): v for k, v in req.header_items()}, req.data)
+            )
+        if host(url) == "api.github.com":
             resp = exito if "status=success" in url else completado
             if isinstance(resp, Exception):
                 raise resp
             return Resp(resp.getvalue())
-        if "api.resend.com" in url:
+        if host(url) == "api.resend.com":
             return resend() if resend else Resp(b"{}")
         return Resp(b"{}")  # latido
 
@@ -82,7 +102,9 @@ def sin_espera(s):
 
 
 def correr(tmp_path, env=None, abrir=None, **kw):
-    return vg.ejecutar(config(tmp_path), env or entorno(), AHORA, abrir or abridor(), sin_espera, **kw)
+    return vg.ejecutar(
+        config(tmp_path), env or entorno(), AHORA, abrir or abridor(), sin_espera, **kw
+    )
 
 
 # --- configuración -----------------------------------------------------------
@@ -107,8 +129,12 @@ def test_proyecto_duplicado_se_rechaza(tmp_path):
 
 
 def test_nombre_de_la_variable_del_token():
-    assert vg.nombre_variable_token("AndresAlberdi/FinOps") == "VIGIA_TOKEN_ANDRESALBERDI"
-    assert vg.nombre_variable_token("segurolotengopy/x") == "VIGIA_TOKEN_SEGUROLOTENGOPY"
+    assert (
+        vg.nombre_variable_token("AndresAlberdi/FinOps") == "VIGIA_TOKEN_ANDRESALBERDI"
+    )
+    assert (
+        vg.nombre_variable_token("segurolotengopy/x") == "VIGIA_TOKEN_SEGUROLOTENGOPY"
+    )
 
 
 # --- estados -----------------------------------------------------------------
@@ -118,13 +144,22 @@ EXITO = ("success", "2026-11-08T10:30:00Z")
 
 def test_clasificar_los_cuatro_estados():
     assert vg.clasificar(EXITO, EXITO, AHORA, 14) == ("vivo", 2)
-    assert vg.clasificar(EXITO, ("failure", "2026-11-08T11:30:00Z"), AHORA, 14) == ("fallido", 2)
-    assert vg.clasificar(("success", "2026-11-07T10:30:00Z"), None, AHORA, 14)[0] == "atrasado"
+    assert vg.clasificar(EXITO, ("failure", "2026-11-08T11:30:00Z"), AHORA, 14) == (
+        "fallido",
+        2,
+    )
+    assert (
+        vg.clasificar(("success", "2026-11-07T10:30:00Z"), None, AHORA, 14)[0]
+        == "atrasado"
+    )
     assert vg.clasificar(None, None, AHORA, 14) == ("sin_datos", None)
 
 
 def test_un_fallo_anterior_al_exito_no_cuenta():
-    assert vg.clasificar(EXITO, ("failure", "2026-11-08T09:00:00Z"), AHORA, 14)[0] == "vivo"
+    assert (
+        vg.clasificar(EXITO, ("failure", "2026-11-08T09:00:00Z"), AHORA, 14)[0]
+        == "vivo"
+    )
 
 
 def test_cancelado_u_omitido_no_vuelve_fallido_un_latido_vivo():
@@ -139,7 +174,10 @@ def test_las_horas_son_desde_el_ultimo_exito_aunque_falle_a_diario():
 
 
 def test_consultar_solo_toma_conclusion_y_fecha():
-    assert vg.consultar(ENTRADA, "t", "success", lambda r, timeout: run(), sin_espera) == EXITO
+    assert (
+        vg.consultar(ENTRADA, "t", "success", lambda r, timeout: run(), sin_espera)
+        == EXITO
+    )
 
 
 @pytest.mark.parametrize("respuesta", [
@@ -178,7 +216,9 @@ def test_error_http_de_la_api_es_sin_datos_sin_reintento():
 
 def test_no_se_siguen_redirecciones():
     manejador = vg._SinRedireccion()
-    assert manejador.redirect_request(None, None, 302, "x", {}, "http://otro.host") is None
+    assert (
+        manejador.redirect_request(None, None, 302, "x", {}, "http://otro.host") is None
+    )
 
 
 def test_el_presupuesto_de_tiempo_deja_el_resto_en_sin_datos(tmp_path, capsys):
@@ -187,7 +227,7 @@ def test_el_presupuesto_de_tiempo_deja_el_resto_en_sin_datos(tmp_path, capsys):
     vistos = []
     rc = vg.ejecutar(config(tmp_path, entradas), entorno(), AHORA, abridor(vistos=vistos),
                      sin_espera, reloj=reloj)  # fmt: skip
-    consultas = [v for v in vistos if "api.github.com" in v[0]]
+    consultas = [v for v in vistos if host(v[0]) == "api.github.com"]
     assert rc == 20 and len(consultas) == 2  # solo la primera entrada se consultó
 
 
@@ -197,14 +237,17 @@ def test_el_presupuesto_de_tiempo_deja_el_resto_en_sin_datos(tmp_path, capsys):
 def test_aviso_informativo_y_urgente():
     a = vg.armar_aviso([("wam", "vivo", 2)], AHORA)
     assert (a["nivel"], a["que_se_espera_de_andres"], a["id_unico"]) == (
-        "informativo", "nada", "vigia-2026-11-08-1230")
+        "informativo",
+        "nada",
+        "vigia-2026-11-08-1230",
+    )
     assert a["ocurrido_en"] == "2026-11-08T12:30:00Z" and vg.validar_aviso(a)
     b = vg.armar_aviso([("wam", "vivo", 2), ("oci", "atrasado", 30)], AHORA)
     assert b["nivel"] == "urgente" and vg.validar_aviso(b)
 
 
 def test_primeros_400_caracteres_llevan_lo_esencial_incluso_con_25_entradas():
-    a = vg.armar_aviso([("proy%d" % i, "atrasado", 300) for i in range(25)], AHORA)
+    a = vg.armar_aviso([(f"proy{i}", "atrasado", 300) for i in range(25)], AHORA)
     assert vg.validar_aviso(a)
     asunto, cuerpo = vg.formatear(a)
     assert "URGENTE" in asunto
@@ -228,9 +271,17 @@ def test_el_validador_rechaza_lo_prohibido_en_texto_y_asunto(texto):
 
 def test_todo_vivo_sale_0_envia_y_avisa_el_latido(tmp_path, capsys):
     vistos = []
-    rc = correr(tmp_path, entorno(HEARTBEAT_URL="https://hc.example/ping"), abridor(vistos=vistos))
+    rc = correr(
+        tmp_path,
+        entorno(HEARTBEAT_URL="https://hc.example/ping"),
+        abridor(vistos=vistos),
+    )
     linea = json.loads(capsys.readouterr().out)
-    assert rc == 0 and linea["resultado"] == "ok" and (linea["vivos"], linea["total"]) == (1, 1)
+    assert (
+        rc == 0
+        and linea["resultado"] == "ok"
+        and (linea["vivos"], linea["total"]) == (1, 1)
+    )
     urls = [v[0] for v in vistos]
     assert "https://api.resend.com/emails" in urls and "https://hc.example/ping" in urls
     envio = next(v for v in vistos if v[0].endswith("/emails"))
@@ -244,7 +295,9 @@ def test_algo_atrasado_sale_20_para_fallar_a_proposito(tmp_path, capsys):
 
 
 def test_fallido_de_punta_a_punta(tmp_path, capsys):
-    rc = correr(tmp_path, abrir=abridor(completado=run("failure", "2026-11-08T11:30:00Z")))
+    rc = correr(
+        tmp_path, abrir=abridor(completado=run("failure", "2026-11-08T11:30:00Z"))
+    )
     assert rc == 20
 
 
@@ -253,13 +306,23 @@ def test_sin_token_es_sin_datos_urgente_y_no_consulta_github(tmp_path, capsys):
     del e["VIGIA_TOKEN_SEGUROLOTENGOPY"]
     vistos = []
     rc = correr(tmp_path, e, abridor(vistos=vistos))
-    assert rc == 20 and not any("api.github.com" in v[0] for v in vistos)
+    assert rc == 20 and not any(host(v[0]) == "api.github.com" for v in vistos)
 
 
-def test_el_registro_nunca_trae_clave_ni_titulos_ni_estado_por_entrada(tmp_path, capsys):
+def test_el_registro_nunca_trae_clave_ni_titulos_ni_estado_por_entrada(
+    tmp_path, capsys
+):
     correr(tmp_path)
     salida = capsys.readouterr().out
-    for prohibido in ("re_clave", "SECRETO", "tok", "a@b.c", "Qué pasó", "wam", "atrasado"):
+    for prohibido in (
+        "re_clave",
+        "SECRETO",
+        "tok",
+        "a@b.c",
+        "Qué pasó",
+        "wam",
+        "atrasado",
+    ):
         assert prohibido not in salida
 
 
@@ -292,7 +355,9 @@ def test_409_concurrente_se_reintenta_y_otro_409_no(tmp_path, capsys):
         cuenta.append(1)
         raise error(409, "concurrent_idempotent_requests")
 
-    assert correr(tmp_path, abrir=abridor(resend=concurrente)) == 12 and len(cuenta) == 3
+    assert (
+        correr(tmp_path, abrir=abridor(resend=concurrente)) == 12 and len(cuenta) == 3
+    )
     cuenta.clear()
 
     def distinta():
@@ -317,7 +382,10 @@ def test_429_limite_de_frecuencia_se_reintenta_y_la_cuota_sale_12(tmp_path, caps
         raise error(429, "daily_quota_exceeded")
 
     assert correr(tmp_path, abrir=abridor(resend=cuota)) == 12 and len(cuenta) == 1
-    assert json.loads(capsys.readouterr().out.splitlines()[-1])["detalle"] == "cuota_agotada"
+    assert (
+        json.loads(capsys.readouterr().out.splitlines()[-1])["detalle"]
+        == "cuota_agotada"
+    )
 
 
 def test_otro_4xx_no_se_reintenta_y_sale_13(tmp_path, capsys):
@@ -360,7 +428,9 @@ def test_config_invalida_sale_13_con_registro_cerrado(tmp_path, capsys):
 
 
 def test_el_workflow_no_usa_disparadores_peligrosos_ni_permisos_de_mas():
-    lineas = (RAIZ / ".github" / "workflows" / "vigia-latidos.yml").read_text().splitlines()
+    lineas = (
+        (RAIZ / ".github" / "workflows" / "vigia-latidos.yml").read_text().splitlines()
+    )
     texto = "\n".join(x for x in lineas if not x.lstrip().startswith("#"))
     assert "pull_request" not in texto and "id-token" not in texto
     assert "contents: write" not in texto
