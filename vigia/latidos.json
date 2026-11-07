@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "nota": "Lista cerrada de latidos vigilados. Agregar una entrada es un PR revisado. Sin secretos ni identificadores de cuenta.",
+  "latidos": [
+    {
+      "proyecto": "wam",
+      "repositorio": "segurolotengopy/WhatsAppModular",
+      "workflow": "latido-receptor.yml",
+      "max_horas": 14
+    }
+  ]
+}
