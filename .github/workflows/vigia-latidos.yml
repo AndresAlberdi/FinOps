@@ -1,0 +1,53 @@
+# =============================================================================
+# vigia-latidos.yml — Vigía de latidos de FinOps (borrador, sin activar)
+# Versión: 0.1 | Fecha: 2026-11-07
+# Diseño: FINOPS_diseno-vigia-de-latidos_2026-11-07.md; SeguridadGeneral, anexo 15 (AL-09)
+# -----------------------------------------------------------------------------
+# - Solo `schedule` y `workflow_dispatch`: nunca pull_request_target ni forks.
+# - Permisos del GITHUB_TOKEN: solo contents: read. La lectura de Actions de los
+#   otros repositorios usa tokens propios de solo lectura (secretos del Environment).
+# - Registro PÚBLICO: el script imprime una línea JSON de lista cerrada; nunca
+#   asunto, cuerpo, clave ni token.
+# - Si algún latido no está vivo, el script sale con 20 y el trabajo falla a
+#   propósito: segundo canal por el correo de fallo de GitHub.
+# - Latido propio: HEARTBEAT_URL (Healthchecks.io) se avisa tras enviar el correo.
+# =============================================================================
+name: vigia-latidos
+
+on:
+  schedule:
+    - cron: "30 12 * * *" # diario, 12:30 UTC (después del resumen de WAM de las 12:00)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vigia-latidos
+  cancel-in-progress: false
+
+jobs:
+  vigilar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    environment: vigia-latidos # Environment dedicado, limitado a la rama main
+    permissions:
+      contents: read
+    steps:
+      - name: Código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Vigilar y avisar
+        env:
+          AVISOS_RESEND_API_KEY: ${{ secrets.AVISOS_RESEND_API_KEY }}
+          AVISOS_DE: ${{ secrets.AVISOS_DE }}
+          AVISOS_PARA: ${{ secrets.AVISOS_PARA }}
+          HEARTBEAT_URL: ${{ secrets.HEARTBEAT_URL }}
+          # Un token de solo lectura (Actions: read) por propietario de repositorio.
+          # Para agregar un propietario: otro secreto con el nombre
+          # VIGIA_TOKEN_<PROPIETARIO> y otra línea aquí, en un PR revisado.
+          VIGIA_TOKEN_ANDRESALBERDI: ${{ secrets.VIGIA_TOKEN_ANDRESALBERDI }}
+          VIGIA_TOKEN_SEGUROLOTENGOPY: ${{ secrets.VIGIA_TOKEN_SEGUROLOTENGOPY }}
+        run: python3 vigia/vigia_latidos.py
